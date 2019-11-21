@@ -1,28 +1,11 @@
 package origamieditor3d.script;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class OrigamiScripter {
-    
-    private static String vector2d(double... xy) {
-        return "[" + xy[0] + " " + xy[1] + "] ";
-    }
-    
-    private static String vector3d(double... xyz) {
-        return "[" + xyz[0] + " " + xyz[1] + " " + xyz[2] + "] ";
-    }
-    
-    private static String vector4d(double... xyzw) {
-        return "[" + xyzw[0] + " " + xyzw[1] + " " + xyzw[2] + " " + xyzw[3] + "] ";
-    }
-    
     private static String vector(double... p) {
-        
-        if (p.length == 2) {
-            return vector2d(p);
-        }
-        if (p.length == 3) {
-            return vector3d(p);
-        }
-        return null;
+        return "[" + Arrays.stream(p).mapToObj(Double::toString).collect(Collectors.joining(" ")) + "] ";
     }
     
     public static String paper(String ptype) {
@@ -30,15 +13,15 @@ public class OrigamiScripter {
     }
     
     public static String paper(double left, double bottom, double right, double top) {
-        return "paper " + vector4d(left, bottom, right, top);
+        return "paper " + vector(left, bottom, right, top);
     }
     
     public static String corner(double... xy) {
-        return "corner " + vector2d(xy);
+        return "corner " + vector(xy);
     }
     
     public static String target(double... xy) {
-        return "target " + vector2d(xy);
+        return "target " + vector(xy);
     }
     
     public static String angle(int ang) {
@@ -46,7 +29,7 @@ public class OrigamiScripter {
     }
     
     public static String plane(double[] point, double[] normal) {
-        return "plane " + vector(point) + vector3d(normal);
+        return "plane " + vector(point) + vector(normal);
     }
     
     public static String planepoint(double... point) {
@@ -54,7 +37,7 @@ public class OrigamiScripter {
     }
     
     public static String planenormal(double... normal) {
-        return "planenormal " + vector3d(normal);
+        return "planenormal " + vector(normal);
     }
     
     public static String planethrough(double[] p1, double[] p2, double[] p3) {
@@ -66,7 +49,7 @@ public class OrigamiScripter {
     }
     
     public static String camera(double[] dir, double[] axx, double[] axy) {
-        return "camera " + vector3d(dir) + vector3d(axx) + vector3d(axy);
+        return "camera " + vector(dir) + vector(axx) + vector(axy);
     }
     
     public static String filename(String path) {
