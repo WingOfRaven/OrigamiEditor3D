@@ -155,7 +155,7 @@ public class Export {
 
     static private void appendObjStreamPDF(StringBuilder builder, int objIndex, String stream) {
         builder.append(objIndex).append(" 0 obj\n");
-        builder.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
+        builder.append("<< /Length ").append(stream.length()).append(" >>\n");
         builder.append("stream\n");
         builder.append(stream);
         builder.append("endstream\n");
@@ -258,11 +258,11 @@ public class Export {
             //Az oldalak száma a cellák számának hatoda felfelé kerekítve
             for (int i = 1; i < (int) Math.ceil((double) cellak_szama / 6); i++) {
 
-                fajl.append(" ").append(Integer.toString(i + 3)).append(" 0 R");
+                fajl.append(" ").append(i + 3).append(" 0 R");
             }
             fajl.append("]\n");
-            fajl.append("/Count ").append(Integer.toString((int) Math.ceil((double) cellak_szama / 6))).append("\n");
-            fajl.append("/MediaBox [0 0 ").append(Integer.toString(page_width)).append(" ").append(Integer.toString(page_height)).append("]\n");
+            fajl.append("/Count ").append((int) Math.ceil((double) cellak_szama / 6)).append("\n");
+            fajl.append("/MediaBox [0 0 ").append(page_width).append(" ").append(page_height).append("]\n");
             fajl.append(">>\n");
             fajl.append("endobj\n\n");
 
@@ -270,7 +270,7 @@ public class Export {
             for (int i = 0; i < (int) Math.ceil((double) cellak_szama / 6); i++) {
 
                 Offszetek.add(fajl.length());
-                fajl.append(Integer.toString(i + 3)).append(" 0 obj\n");
+                fajl.append(i + 3).append(" 0 obj\n");
                 fajl.append("<< /Type /Page\n");
                 fajl.append("/Parent 2 0 R\n");
                 fajl.append("/Resources\n");
@@ -294,8 +294,8 @@ public class Export {
                     if (ii != (int) Math.ceil((double) cellak_szama / 6) + i * 6) {
                         fajl.append(" ");
                     }
-                    fajl.append(Integer.toString(ii + 3)).append(" 0 R");
-                    fajl.append(" ").append(Integer.toString(ii + cellak_szama + 3)).append(" 0 R");
+                    fajl.append(ii + 3).append(" 0 R");
+                    fajl.append(" ").append(ii + cellak_szama + 3).append(" 0 R");
                 }
                 fajl.append("]\n");
                 fajl.append(">>\n");
@@ -320,7 +320,7 @@ public class Export {
             Offszetek.add(fajl.length());
             stream = new StringBuilder("BT\n");
             stream.append("/F1 12 Tf\n");
-            stream.append(Integer.toString((int) (page_width - 2 * figure_frame) / 4)).append(" 760 Td\n");
+            stream.append((int) (page_width - 2 * figure_frame) / 4).append(" 760 Td\n");
             stream.append("14 TL\n");
             stream.append(Instructor.getString("disclaimer", Constants.VERSION)).append("\n");
             stream.append("ET\n");
@@ -346,14 +346,13 @@ public class Export {
             //Ábrák
             for (int i = 0; i <= origami1.getHistory().size(); i++) {
 
-                int x = 0, y = 0;
                 String kep;
 
                 if (ForgatasIndexek.contains(i)) {
 
                     int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
-                    x = page_width / 4 * (2*(position%2)+1);
-                    y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
+                    int x = page_width / 4 * (2*(position%2)+1);
+                    int y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
 
                     kamera.adjust(origami1);
                     kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
@@ -376,8 +375,8 @@ public class Export {
                     setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
 
                     int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
-                    x = page_width / 4 * (2*(position%2)+1);
-                    y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
+                    int x = page_width / 4 * (2*(position%2)+1);
+                    int y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
 
                     double[] sikpont;
                     double[] siknv;
@@ -444,8 +443,8 @@ public class Export {
             Offszetek.add(bajtszam);
             stream = new StringBuilder("BT\n");
             stream.append("/F1 12 Tf\n");
-            stream.append(Integer.toString((int) (page_width - 2 * figure_frame) / 4)).append(" ").append(Integer.toString(722 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
-                    + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14)).append(" Td\n");
+            stream.append((int) (page_width - 2 * figure_frame) / 4).append(" ").append(722 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
+                    + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14).append(" Td\n");
             stream.append("12 TL\n");
             stream.append(Instructor.getString("difficulty", dif, difname)).append("\n");
             stream.append("ET\n");
@@ -458,8 +457,8 @@ public class Export {
             Offszetek.add(bajtszam);
             stream = new StringBuilder("BT\n");
             stream.append("/F1 12 Tf\n");
-            stream.append(Integer.toString((int) (page_width - 2 * figure_frame) / 4)).append(" ").append(Integer.toString(736 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
-                    + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14)).append(" Td\n");
+            stream.append((int) (page_width - 2 * figure_frame) / 4).append(" ").append(736 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
+                    + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14).append(" Td\n");
             stream.append(Instructor.getString("steps", cellak_szama - 2)).append("Tj\n");
             stream.append("ET\n");
             appendObjStreamPDF(fajl, objindex, stream.toString());
@@ -687,7 +686,7 @@ public class Export {
             int xroffszet = bajtszam;
 
             fajl.append("xref\n");
-            fajl.append("0 ").append(Integer.toString(Offszetek.size())).append("\n");
+            fajl.append("0 ").append(Offszetek.size()).append("\n");
             fajl.append("0000000000 65535 f \n");
 
             for (int i = 1; i < Offszetek.size(); i++) {
@@ -695,16 +694,16 @@ public class Export {
                 for (int ii = 0; ii < 10 - Integer.toString(Offszetek.get(i)).length(); ii++) {
                     fajl.append("0");
                 }
-                fajl.append(Integer.toString(Offszetek.get(i)));
+                fajl.append(Offszetek.get(i));
                 fajl.append(" 00000 n \n");
             }
 
             fajl.append("trailer\n");
             fajl.append("<< /Root 1 0 R\n");
-            fajl.append("/Size ").append(Integer.toString(Offszetek.size())).append("\n");
+            fajl.append("/Size ").append(Offszetek.size()).append("\n");
             fajl.append(">>\n");
             fajl.append("startxref\n");
-            fajl.append(Integer.toString(xroffszet)).append("\n");
+            fajl.append(xroffszet).append("\n");
             fajl.append("%%EOF");
 
             str.writeBytes(fajl.toString());
