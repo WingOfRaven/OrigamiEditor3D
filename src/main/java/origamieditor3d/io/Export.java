@@ -153,6 +153,15 @@ public class Export {
         }
     }
 
+    static private void appendObjStreamPDF(StringBuilder builder, int objIndex, String stream) {
+        builder.append(objIndex).append(" 0 obj\n");
+        builder.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
+        builder.append("stream\n");
+        builder.append(stream);
+        builder.append("endstream\n");
+        builder.append("endobj\n\n");
+    }
+
     static public void exportPDF(Origami origami, String filename, String title) throws Exception {
 
         try (DataOutputStream str = new DataOutputStream(Files.newOutputStream(Paths.get(filename),
@@ -305,12 +314,7 @@ public class Export {
             }
             stream.append(title).append(") Tj\n");
             stream.append("ET\n");
-            fajl.append(Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 3)).append(" 0 obj\n");
-            fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-            fajl.append("stream\n");
-            fajl.append(stream);
-            fajl.append("endstream\n");
-            fajl.append("endobj\n\n");
+            appendObjStreamPDF(fajl, (int) Math.ceil((double) cellak_szama / 6) + 3, stream.toString());
 
             //A cím alatti két üres cellában van helyünk a reklámozásra
             Offszetek.add(fajl.length());
@@ -320,12 +324,7 @@ public class Export {
             stream.append("14 TL\n");
             stream.append(Instructor.getString("disclaimer", Constants.VERSION)).append("\n");
             stream.append("ET\n");
-            fajl.append(Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 4)).append(" 0 obj\n");
-            fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-            fajl.append("stream\n");
-            fajl.append(stream);
-            fajl.append("endstream\n");
-            fajl.append("endobj\n\n");
+            appendObjStreamPDF(fajl, (int) Math.ceil((double) cellak_szama / 6) + 4, stream.toString());
             str.writeBytes(fajl.toString());
             bajtszam += fajl.length();
             fajl = new StringBuilder();
@@ -365,12 +364,7 @@ public class Export {
                     stream.append(" ");
                     stream.append(kep);
                     stream.append("Q\n");
-                    fajl.append(Integer.toString(objindex)).append(" 0 obj\n");
-                    fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-                    fajl.append("stream\n");
-                    fajl.append(stream);
-                    fajl.append("endstream\n");
-                    fajl.append("endobj\n\n");
+                    appendObjStreamPDF(fajl, objindex, stream.toString());
                     objindex++;
                     str.writeBytes(fajl.toString());
                     bajtszam += fajl.length();
@@ -448,12 +442,7 @@ public class Export {
                     stream.append(" ");
                     stream.append(kep);
                     stream.append("Q\n");
-                    fajl.append(Integer.toString(objindex)).append(" 0 obj\n");
-                    fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-                    fajl.append("stream\n");
-                    fajl.append(stream);
-                    fajl.append("endstream\n");
-                    fajl.append("endobj\n\n");
+                    appendObjStreamPDF(fajl, objindex, stream.toString());
                     objindex++;
                     str.writeBytes(fajl.toString());
                     bajtszam += fajl.length();
@@ -488,12 +477,7 @@ public class Export {
             stream.append("12 TL\n");
             stream.append(Instructor.getString("difficulty", dif, difname)).append("\n");
             stream.append("ET\n");
-            fajl.append(Integer.toString(objindex)).append(" 0 obj\n");
-            fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-            fajl.append("stream\n");
-            fajl.append(stream);
-            fajl.append("endstream\n");
-            fajl.append("endobj\n\n");
+            appendObjStreamPDF(fajl, objindex, stream.toString());
             objindex++;
             str.writeBytes(fajl.toString());
             bajtszam += fajl.length();
@@ -506,12 +490,7 @@ public class Export {
                     + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14)).append(" Td\n");
             stream.append(Instructor.getString("steps", cellak_szama - 2)).append("Tj\n");
             stream.append("ET\n");
-            fajl.append(Integer.toString(objindex)).append(" 0 obj\n");
-            fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-            fajl.append("stream\n");
-            fajl.append(stream);
-            fajl.append("endstream\n");
-            fajl.append("endobj\n\n");
+            appendObjStreamPDF(fajl, objindex, stream.toString());
             objindex++;
             str.writeBytes(fajl.toString());
             bajtszam += fajl.length();
@@ -550,12 +529,7 @@ public class Export {
                     stream.append("12 TL\n");
                     stream.append(utasitas).append("\n");
                     stream.append("ET\n");
-                    fajl.append(Integer.toString(objindex + sorszam - 2)).append(" 0 obj\n");
-                    fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-                    fajl.append("stream\n");
-                    fajl.append(stream);
-                    fajl.append("endstream\n");
-                    fajl.append("endobj\n\n");
+                    appendObjStreamPDF(fajl, objindex + sorszam - 2, stream.toString());
                     str.writeBytes(fajl.toString());
                     bajtszam += fajl.length();
                     fajl = new StringBuilder();
@@ -759,12 +733,7 @@ public class Export {
                     stream.append("12 TL\n");
                     stream.append(utasitas).append("\n");
                     stream.append("ET\n");
-                    fajl.append(Integer.toString(objindex + sorszam - 2)).append(" 0 obj\n");
-                    fajl.append("<< /Length ").append(Integer.toString(stream.length())).append(" >>\n");
-                    fajl.append("stream\n");
-                    fajl.append(stream);
-                    fajl.append("endstream\n");
-                    fajl.append("endobj\n\n");
+                    appendObjStreamPDF(fajl, objindex + sorszam - 2, stream.toString());
                     str.writeBytes(fajl.toString());
                     bajtszam += fajl.length();
                     fajl = new StringBuilder();
