@@ -708,16 +708,11 @@ public class Export {
         }
     }
 
-    static public void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename) throws Exception {
+    static public void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename, boolean revolving) throws Exception {
 
         try (FileOutputStream fos = new FileOutputStream(filename)) {
 
-            fos.write('G');
-            fos.write('I');
-            fos.write('F');
-            fos.write('8');
-            fos.write('9');
-            fos.write('a');
+            fos.write("GIF89a".getBytes());
 
             fos.write((byte) width);
             fos.write((byte) (width >>> 8));
@@ -744,17 +739,7 @@ public class Export {
             fos.write(0x21);
             fos.write(0xFF);
             fos.write(0x0B);
-            fos.write('N');
-            fos.write('E');
-            fos.write('T');
-            fos.write('S');
-            fos.write('C');
-            fos.write('A');
-            fos.write('P');
-            fos.write('E');
-            fos.write('2');
-            fos.write('.');
-            fos.write('0');
+            fos.write("NETSCAPE2.0".getBytes());
             fos.write(0x03);
             fos.write(0x01);
             fos.write(0x00);
@@ -770,21 +755,40 @@ public class Export {
             cam.setXAxis(refcam.getXAxis().clone());
             cam.setYAxis(refcam.getYAxis().clone());
             cam.setZoom(0.8 * Math.min(width, height) / origami1.circumscribedSquareSize());
-            int steps = origami1.getHistoryPointer();
-            origami1.undo(steps);
+
+            int steps;
             boolean last = false;
-            while (origami1.getHistoryPointer() < steps || (last = !last && origami1.getHistoryPointer() == steps)) {
+
+            if (!revolving) {
+                steps = origami1.getHistoryPointer();
+                origami1.undo(steps);
+            } else {
+                cam.adjust(origami1);
+                steps = 0;
+            }
+
+            while ((!revolving && (origami1.getHistoryPointer() < steps || (last = !last && origami1.getHistoryPointer() == steps))) ||
+                    (revolving && steps < 72)) {
 
                 gimg.clearRect(0, 0, width, height);
-                cam.adjust(origami1);
-                cam.drawFaces(gimg, color, origami1);
-                cam.drawEdges(gimg, java.awt.Color.black, origami1);
-                origami1.redo();
+
+                if (!revolving) {
+                    cam.adjust(origami1);
+                    cam.drawFaces(gimg, color, origami1);
+                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    origami1.redo();
+                } else {
+                    cam.drawGradient(gimg, color, origami1);
+                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    cam.rotate(10, 0);
+                    steps++;
+                }
+
                 fos.write(0x21);
                 fos.write(0xF9);
                 fos.write(0x04);
                 fos.write(0x04);
-                fos.write(0x64); //delay time
+                fos.write(!revolving ? 0x64 : 0x05); //delay time
                 fos.write(0x00);
                 fos.write(0x00);
                 fos.write(0x00);
@@ -834,143 +838,18 @@ public class Export {
 
             fos.write(0x3B);
             System.out.println(fos.getChannel().position() + " bytes written to " + filename);
-            fos.close();
 
         } catch (IOException ex) {
             throw OrigamiException.H005;
         }
     }
 
+    static public void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename) throws Exception {
+        exportGIF(origami, refcam, color, width, height, filename, false);
+    }
+
     static public void exportRevolvingGIF(Origami origami, Camera refcam, int color, int width, int height, String filename) throws Exception {
-
-        try (FileOutputStream fos = new FileOutputStream(filename)) {
-
-            fos.write('G');
-            fos.write('I');
-            fos.write('F');
-            fos.write('8');
-            fos.write('9');
-            fos.write('a');
-
-            fos.write((byte) width);
-            fos.write((byte) (width >>> 8));
-            fos.write((byte) height);
-            fos.write((byte) (height >>> 8));
-            fos.write(0b10010110);
-            fos.write(0);
-            fos.write(0);
-
-            for (int r = 1; r <= 5; r++) {
-                for (int g = 1; g <= 5; g++) {
-                    for (int b = 1; b <= 5; b++) {
-
-                        fos.write(r * 51);
-                        fos.write(g * 51);
-                        fos.write(b * 51);
-                    }
-                }
-            }
-            for (int i = 0; i < 9; i++) {
-                fos.write(0);
-            }
-
-            fos.write(0x21);
-            fos.write(0xFF);
-            fos.write(0x0B);
-            fos.write('N');
-            fos.write('E');
-            fos.write('T');
-            fos.write('S');
-            fos.write('C');
-            fos.write('A');
-            fos.write('P');
-            fos.write('E');
-            fos.write('2');
-            fos.write('.');
-            fos.write('0');
-            fos.write(0x03);
-            fos.write(0x01);
-            fos.write(0x00);
-            fos.write(0x00);
-            fos.write(0x00);
-
-            BufferedImage img = new BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
-            Graphics2D gimg = img.createGraphics();
-            gimg.setBackground(java.awt.Color.WHITE);
-            Origami origami1 = origami.copy();
-            Camera cam = new Camera(width / 2, height / 2, 1);
-            cam.setCamDirection(refcam.getCamDirection().clone());
-            cam.setXAxis(refcam.getXAxis().clone());
-            cam.setYAxis(refcam.getYAxis().clone());
-            cam.setZoom(0.8 * Math.min(width, height) / origami1.circumscribedSquareSize());
-            cam.adjust(origami1);
-
-            for (int i = 0; i < 72; i++) {
-
-                gimg.clearRect(0, 0, width, height);
-                cam.drawGradient(gimg, color, origami1);
-                cam.drawEdges(gimg, java.awt.Color.black, origami1);
-                cam.rotate(10, 0);
-
-                fos.write(0x21);
-                fos.write(0xF9);
-                fos.write(0x04);
-                fos.write(0x04);
-                fos.write(0x05); //delay time
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write(0x00);
-
-                fos.write(0x2C);
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write((byte) width);
-                fos.write((byte) (width >>> 8));
-                fos.write((byte) height);
-                fos.write((byte) (height >>> 8));
-                fos.write(0x00);
-
-                fos.write(0x07);
-
-                for (int y = 0; y < height; y++) {
-
-                    fos.write(width / 2 + 1);
-                    fos.write(0x80);
-                    for (int x = 0; x < width / 2; x++) {
-
-                        int rgb = img.getRGB(x, y) & 0xFFFFFF;
-                        int b = rgb % 0x100;
-                        int g = (rgb >>> 8) % 0x100;
-                        int r = rgb >>> 16;
-
-                        fos.write((((r * 5) / 256) * 25 + ((g * 5) / 256) * 5 + (b * 5) / 256));
-                    }
-                    fos.write(width - width / 2 + 1);
-                    fos.write(0x80);
-                    for (int x = width / 2; x < width; x++) {
-
-                        int rgb = img.getRGB(x, y) & 0xFFFFFF;
-                        int b = rgb % 0x100;
-                        int g = (rgb >>> 8) % 0x100;
-                        int r = rgb >>> 16;
-
-                        fos.write((((r * 5) / 256) * 25 + ((g * 5) / 256) * 5 + (b * 5) / 256));
-                    }
-                }
-                fos.write(0x01);
-                fos.write(0x81);
-                fos.write(0);
-            }
-
-            fos.write(0x3B);
-            System.out.println(fos.getChannel().position() + " bytes written to " + filename);
-            fos.close();
-
-        } catch (IOException ex) {
-            throw OrigamiException.H005;
-        }
+        exportGIF(origami, refcam, color, width, height, filename, true);
     }
 
     static public void exportPNG(Origami origami, String filename) throws Exception {
@@ -1016,7 +895,7 @@ public class Export {
                 ordinal++;
             }
 
-            InputStream is = new Export().getClass().getResourceAsStream("/res/OrigamiDisplay.jar");
+            InputStream is = Export.class.getResourceAsStream("/res/OrigamiDisplay.jar");
             OutputStream os = new FileOutputStream(tempJar);
 
             int nextbyte;
