@@ -346,66 +346,49 @@ public class Export {
             //Ábrák
             for (int i = 0; i <= origami1.getHistory().size(); i++) {
 
-                String kep;
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
 
-                if (ForgatasIndexek.contains(i)) {
-
-                    int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
-                    int x = page_width / 4 * (2*(position%2)+1);
-                    int y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
-
-                    kamera.adjust(origami1);
-                    kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
-                    kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
-
-                    Offszetek.add(bajtszam);
-                    stream = new StringBuilder("q");
-                    stream.append(" ");
-                    stream.append(kep);
-                    stream.append("Q\n");
-                    appendObjStreamPDF(fajl, objindex, stream.toString());
-                    objindex++;
-                    str.writeBytes(fajl.toString());
-                    bajtszam += fajl.length();
-                    fajl = new StringBuilder();
-                }
-
-                if (!UresIndexek.contains(i) && i < origami1.getHistory().size()) {
-
-                    setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
+                    String kep;
 
                     int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
                     int x = page_width / 4 * (2*(position%2)+1);
                     int y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
 
-                    double[] sikpont;
-                    double[] siknv;
+                    if (ForgatasIndexek.contains(i)) {
+                        kamera.adjust(origami1);
+                        kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
+                        kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
+                    } else {
+                        setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
+                        kamera.adjust(origami1);
+                        kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
 
-                    kamera.adjust(origami1);
-                    kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
+                        double[] sikpont;
+                        double[] siknv;
 
-                    switch (origami1.getHistory().get(i).foldID) {
+                        switch (origami1.getHistory().get(i).foldID) {
 
-                        case Origami.FoldingAction.FOLD_REFLECTION:
-                        case Origami.FoldingAction.FOLD_ROTATION:
-                        case Origami.FoldingAction.FOLD_CREASE:
-                        case Origami.FoldingAction.FOLD_MUTILATION:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
+                            case Origami.FoldingAction.FOLD_REFLECTION:
+                            case Origami.FoldingAction.FOLD_ROTATION:
+                            case Origami.FoldingAction.FOLD_CREASE:
+                            case Origami.FoldingAction.FOLD_MUTILATION:
+                                sikpont = origami1.getHistory().get(i).ppoint;
+                                siknv = origami1.getHistory().get(i).pnormal;
+                                kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
+                                break;
 
-                        case Origami.FoldingAction.FOLD_REFLECTION_P:
-                        case Origami.FoldingAction.FOLD_ROTATION_P:
-                        case Origami.FoldingAction.FOLD_MUTILATION_P:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
+                            case Origami.FoldingAction.FOLD_REFLECTION_P:
+                            case Origami.FoldingAction.FOLD_ROTATION_P:
+                            case Origami.FoldingAction.FOLD_MUTILATION_P:
+                                sikpont = origami1.getHistory().get(i).ppoint;
+                                siknv = origami1.getHistory().get(i).pnormal;
+                                kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
+                                break;
 
-                        default:
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
-                            break;
+                            default:
+                                kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
+                                break;
+                        }
                     }
 
                     Offszetek.add(bajtszam);
@@ -477,191 +460,176 @@ public class Export {
 
                 double[] siknv;
 
-                if (ForgatasIndexek.contains(i)) {
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
 
-                    if (i == origami1.getHistory().size()) {
+                    if (ForgatasIndexek.contains(i)) {
 
-                        utasitas = Instructor.getString("outro", sorszam);
-                        sorszam++;
+                        if (i == origami1.getHistory().size()) {
+
+                            utasitas = Instructor.getString("outro", sorszam);
+                            sorszam++;
+                        } else {
+
+                            utasitas = Instructor.getString("turn", sorszam, ForgatasSzogek.get(ForgatasIndexek.indexOf(i)));
+                            sorszam++;
+                        }
                     } else {
 
-                        utasitas = Instructor.getString("turn", sorszam, ForgatasSzogek.get(ForgatasIndexek.indexOf(i)));
-                        sorszam++;
-                    }
+                        setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
 
-                    int position = sorszam % 6;
-                    koo = (page_width / 2 * (position % 2) + (page_width / 2 - figure_frame) / 3) + " ";
-                    koo += Integer.toString(page_height / 3 * (2-position/2) + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
+                        switch (origami1.getHistory().get(i).foldID) {
 
-                    Offszetek.add(bajtszam);
-                    stream = new StringBuilder("BT\n");
-                    stream.append("/F1 10 Tf\n");
-                    stream.append(koo).append(" Td\n");
-                    stream.append("12 TL\n");
-                    stream.append(utasitas).append("\n");
-                    stream.append("ET\n");
-                    appendObjStreamPDF(fajl, objindex + sorszam - 2, stream.toString());
-                    str.writeBytes(fajl.toString());
-                    bajtszam += fajl.length();
-                    fajl = new StringBuilder();
-                }
+                            case Origami.FoldingAction.FOLD_REFLECTION:
+                                siknv = origami1.getHistory().get(i).pnormal;
+                                switch (foldtypes.get(i)) {
 
-                if (!UresIndexek.contains(i) && i < origami1.getHistory().size()) {
+                                    case 0:
+                                        utasitas = Instructor.getString("no_fold", sorszam);
+                                        break;
 
-                    setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
+                                    case -1:
+                                        utasitas = Instructor.getString("fold_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        break;
 
-                    switch (origami1.getHistory().get(i).foldID) {
+                                    case -2:
+                                        utasitas = Instructor.getString("fold/rev_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        break;
 
-                        case Origami.FoldingAction.FOLD_REFLECTION:
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            switch (foldtypes.get(i)) {
+                                    case -3:
+                                        utasitas = Instructor.getString("rev_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        break;
 
-                                case 0:
-                                    utasitas = Instructor.getString("no_fold", sorszam);
-                                    break;
+                                    case -4:
+                                        utasitas = Instructor.getString("fold/sink_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        break;
 
-                                case -1:
-                                    utasitas = Instructor.getString("fold_" + kamera.pdfLinerDir(siknv), sorszam);
-                                    break;
+                                    case -5:
+                                        utasitas = Instructor.getString("rev/sink_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        break;
 
-                                case -2:
-                                    utasitas = Instructor.getString("fold/rev_" + kamera.pdfLinerDir(siknv), sorszam);
-                                    break;
-
-                                case -3:
-                                    utasitas = Instructor.getString("rev_" + kamera.pdfLinerDir(siknv), sorszam);
-                                    break;
-
-                                case -4:
-                                    utasitas = Instructor.getString("fold/sink_" + kamera.pdfLinerDir(siknv), sorszam);
-                                    break;
-
-                                case -5:
-                                    utasitas = Instructor.getString("rev/sink_" + kamera.pdfLinerDir(siknv), sorszam);
-                                    break;
-
-                                default:
-                                    utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
-                                    break;
-                            }
-
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_ROTATION:
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            int szog = 0;
-                            int j = i - 1;
-                            while (UresIndexek.contains(j)) {
-
-                                if (origami1.getHistory().get(j).foldID == Origami.FoldingAction.FOLD_ROTATION) {
-
-                                    szog += origami1.getHistory().get(j).phi;
+                                    default:
+                                        utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
+                                        break;
                                 }
-                                j--;
-                            }
 
-                            utasitas = Instructor.getString("rotate_" + kamera.pdfLinerDir(siknv), sorszam, szog + origami1.getHistory().get(i).phi);
-                            sorszam++;
-                            break;
+                                sorszam++;
+                                break;
 
-                        case Origami.FoldingAction.FOLD_REFLECTION_P:
-                            switch (foldtypes.get(i)) {
+                            case Origami.FoldingAction.FOLD_ROTATION:
+                                siknv = origami1.getHistory().get(i).pnormal;
+                                int szog = 0;
+                                int j = i - 1;
+                                while (UresIndexek.contains(j)) {
 
-                                case 0:
-                                    utasitas = Instructor.getString("no_fold", sorszam);
-                                    break;
-                                case -1:
-                                    utasitas = Instructor.getString("fold_gray", sorszam);
-                                    break;
-                                case -2:
-                                    utasitas = Instructor.getString("fold/rev_gray", sorszam);
-                                    break;
-                                case -3:
-                                    utasitas = Instructor.getString("rev_gray", sorszam);
-                                    break;
-                                case -4:
-                                    utasitas = Instructor.getString("fold/sink_gray", sorszam);
-                                    break;
-                                case -5:
-                                    utasitas = Instructor.getString("rev/sink_gray", sorszam);
-                                    break;
-                            }
-                            sorszam++;
-                            break;
+                                    if (origami1.getHistory().get(j).foldID == Origami.FoldingAction.FOLD_ROTATION) {
 
-                        case Origami.FoldingAction.FOLD_ROTATION_P:
-                            int szog1 = 0;
-                            int j1 = i - 1;
-                            while (UresIndexek.contains(j1)) {
-
-                                if (origami1.getHistory().get(j1).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
-
-                                    szog1 += origami1.getHistory().get(j1).phi;
+                                        szog += origami1.getHistory().get(j).phi;
+                                    }
+                                    j--;
                                 }
-                                j1--;
-                            }
-                            utasitas = Instructor.getString("rotate_gray", sorszam, szog1 + origami1.getHistory().get(i).phi);
-                            sorszam++;
-                            break;
 
-                        case Origami.FoldingAction.FOLD_CREASE:
-                            utasitas = Instructor.getString("crease", sorszam, sorszam + 1);
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_MUTILATION:
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            utasitas = Instructor.getString("cut_" + kamera.pdfLinerDir(siknv), sorszam);
-                            if (firstblood) {
-                                utasitas += Instructor.getString("cut_notice");
-                                firstblood = false;
-                            }
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_MUTILATION_P:
-                            utasitas = Instructor.getString("cut_gray", sorszam);
-                            if (firstblood) {
-                                utasitas += Instructor.getString("cut_notice");
-                                firstblood = false;
-                            }
-                            sorszam++;
-                            break;
-
-                        default:
-                            utasitas = "(" + sorszam + ". ???) ' ";
-                            sorszam++;
-                            break;
-                    }
-
-                    if (i == 0) {
-
-                        switch (origami1.getPaperType()) {
-
-                            case A4:
-                                utasitas = Instructor.getString("intro_a4", sorszam) + utasitas;
+                                utasitas = Instructor.getString("rotate_" + kamera.pdfLinerDir(siknv), sorszam, szog + origami1.getHistory().get(i).phi);
+                                sorszam++;
                                 break;
-                            case Square:
-                                utasitas = Instructor.getString("intro_square", sorszam) + utasitas;
-                                break;
-                            case Hexagon:
-                                utasitas = Instructor.getString("intro_hex", sorszam) + utasitas;
-                                break;
-                            case Dollar:
-                                utasitas = Instructor.getString("intro_dollar", sorszam) + utasitas;
-                                break;
-                            case Custom:
-                                if (origami1.getCorners().size() == 3) {
-                                    utasitas = Instructor.getString("intro_triangle", sorszam) + utasitas;
-                                } else if (origami1.getCorners().size() == 4) {
-                                    utasitas = Instructor.getString("intro_quad", sorszam) + utasitas;
-                                } else {
-                                    utasitas = Instructor.getString("intro_poly", sorszam) + utasitas;
+
+                            case Origami.FoldingAction.FOLD_REFLECTION_P:
+                                switch (foldtypes.get(i)) {
+
+                                    case 0:
+                                        utasitas = Instructor.getString("no_fold", sorszam);
+                                        break;
+                                    case -1:
+                                        utasitas = Instructor.getString("fold_gray", sorszam);
+                                        break;
+                                    case -2:
+                                        utasitas = Instructor.getString("fold/rev_gray", sorszam);
+                                        break;
+                                    case -3:
+                                        utasitas = Instructor.getString("rev_gray", sorszam);
+                                        break;
+                                    case -4:
+                                        utasitas = Instructor.getString("fold/sink_gray", sorszam);
+                                        break;
+                                    case -5:
+                                        utasitas = Instructor.getString("rev/sink_gray", sorszam);
+                                        break;
                                 }
+                                sorszam++;
                                 break;
+
+                            case Origami.FoldingAction.FOLD_ROTATION_P:
+                                int szog1 = 0;
+                                int j1 = i - 1;
+                                while (UresIndexek.contains(j1)) {
+
+                                    if (origami1.getHistory().get(j1).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
+
+                                        szog1 += origami1.getHistory().get(j1).phi;
+                                    }
+                                    j1--;
+                                }
+                                utasitas = Instructor.getString("rotate_gray", sorszam, szog1 + origami1.getHistory().get(i).phi);
+                                sorszam++;
+                                break;
+
+                            case Origami.FoldingAction.FOLD_CREASE:
+                                utasitas = Instructor.getString("crease", sorszam, sorszam + 1);
+                                sorszam++;
+                                break;
+
+                            case Origami.FoldingAction.FOLD_MUTILATION:
+                                siknv = origami1.getHistory().get(i).pnormal;
+                                utasitas = Instructor.getString("cut_" + kamera.pdfLinerDir(siknv), sorszam);
+                                if (firstblood) {
+                                    utasitas += Instructor.getString("cut_notice");
+                                    firstblood = false;
+                                }
+                                sorszam++;
+                                break;
+
+                            case Origami.FoldingAction.FOLD_MUTILATION_P:
+                                utasitas = Instructor.getString("cut_gray", sorszam);
+                                if (firstblood) {
+                                    utasitas += Instructor.getString("cut_notice");
+                                    firstblood = false;
+                                }
+                                sorszam++;
+                                break;
+
                             default:
+                                utasitas = "(" + sorszam + ". ???) ' ";
+                                sorszam++;
                                 break;
+                        }
+
+                        if (i == 0) {
+
+                            switch (origami1.getPaperType()) {
+
+                                case A4:
+                                    utasitas = Instructor.getString("intro_a4", sorszam) + utasitas;
+                                    break;
+                                case Square:
+                                    utasitas = Instructor.getString("intro_square", sorszam) + utasitas;
+                                    break;
+                                case Hexagon:
+                                    utasitas = Instructor.getString("intro_hex", sorszam) + utasitas;
+                                    break;
+                                case Dollar:
+                                    utasitas = Instructor.getString("intro_dollar", sorszam) + utasitas;
+                                    break;
+                                case Custom:
+                                    if (origami1.getCorners().size() == 3) {
+                                        utasitas = Instructor.getString("intro_triangle", sorszam) + utasitas;
+                                    } else if (origami1.getCorners().size() == 4) {
+                                        utasitas = Instructor.getString("intro_quad", sorszam) + utasitas;
+                                    } else {
+                                        utasitas = Instructor.getString("intro_poly", sorszam) + utasitas;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
 
