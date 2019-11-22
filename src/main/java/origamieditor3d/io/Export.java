@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -38,9 +40,25 @@ public class Export {
     final static public int page_height = 842;
     final static public int figure_frame = 200;
 
+    static private void writeIntLE(OutputStream out, int value) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(value);
+        out.write(buffer.array());
+    }
+
+    static private void writeFloatLE(OutputStream out, float value) throws IOException {
+        writeIntLE(out, Float.floatToIntBits(value));
+    }
+
     static public void exportCTM(Origami origami, String filename, BufferedImage texture) throws Exception {
 
-        try {
+        File ctm = new File(filename);
+        if (ctm.exists()) {
+            ctm.delete();
+        }
+
+        try (FileOutputStream str = new FileOutputStream(filename)) {
 
             Camera kamera = new Camera(0, 0, 1);
             kamera.adjust(origami);
@@ -53,201 +71,73 @@ public class Export {
                 }
             }
 
-            ArrayList<Byte> bajtlista = new ArrayList<>();
-            int uj_int;
-
             //OCTM
-            uj_int = 0x4d54434f;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x4d54434f);
 
             //5. verzió
-            uj_int = 0x00000005;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00000005);
 
             //RAW tömörítés
-            uj_int = 0x00574152;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00574152);
 
             //Pontok száma
-            uj_int = origami.getVerticesSize();
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, origami.getVerticesSize());
 
             //Háromszögek száma
-            uj_int = haromszogek_hossz;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, haromszogek_hossz);
 
             //UV térképek száma
-            uj_int = texture == null ? 0 : 1;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, texture == null ? 0 : 1);
 
             //Attibrútumtérképek száma
-            uj_int = 0x00000000;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00000000);
 
             //Csúcsonkénti merôlegesek nincsenek
-            uj_int = 0x00000000;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00000000);
 
             //Reklám
-            uj_int = 0x00000020;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
-
-            uj_int = 0x43726561;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x74656420;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x77697468;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x204f7269;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x67616d69;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x20456469;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x746f7220;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x33442e20;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
+            byte[] comment = "Created with Origami Editor 3D. ".getBytes();
+            writeIntLE(str, comment.length);
+            str.write(comment);
 
             //INDX
-            uj_int = 0x58444e49;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x58444e49);
 
             //Háromszögek
             for (int i = 0; i < origami.getPolygonsSize(); i++) {
 
                 if (origami.isNonDegenerate(i)) {
-
                     for (int ii = 1; ii < origami.getPolygons().get(i).size() - 1; ii++) {
-
-                        uj_int = origami.getPolygons().get(i).get(0);
-                        bajtlista.add((byte) (uj_int));
-                        bajtlista.add((byte) (uj_int >>> 8));
-                        bajtlista.add((byte) (uj_int >>> 16));
-                        bajtlista.add((byte) (uj_int >>> 24));
-
-                        uj_int = origami.getPolygons().get(i).get(ii);
-                        bajtlista.add((byte) (uj_int));
-                        bajtlista.add((byte) (uj_int >>> 8));
-                        bajtlista.add((byte) (uj_int >>> 16));
-                        bajtlista.add((byte) (uj_int >>> 24));
-
-                        uj_int = origami.getPolygons().get(i).get(ii + 1);
-                        bajtlista.add((byte) (uj_int));
-                        bajtlista.add((byte) (uj_int >>> 8));
-                        bajtlista.add((byte) (uj_int >>> 16));
-                        bajtlista.add((byte) (uj_int >>> 24));
+                        writeIntLE(str, origami.getPolygons().get(i).get(0));
+                        writeIntLE(str, origami.getPolygons().get(i).get(ii));
+                        writeIntLE(str, origami.getPolygons().get(i).get(ii + 1));
                     }
                 }
             }
 
             //VERT
-            uj_int = 0x54524556;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x54524556);
 
             //Csúcsok
             for (int i = 0; i < origami.getVerticesSize(); i++) {
-
-                uj_int = Float.floatToIntBits((float) origami.getVertices().get(i)[0] - (float) kamera.getCamPosition()[0]);
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
-
-                uj_int = Float.floatToIntBits((float) origami.getVertices().get(i)[1] - (float) kamera.getCamPosition()[1]);
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
-
-                uj_int = Float.floatToIntBits((float) origami.getVertices().get(i)[2] - (float) kamera.getCamPosition()[2]);
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
+                for (int j = 0; j < 3; j++) {
+                    writeFloatLE(str, (float) ((float)origami.getVertices().get(i)[j] - (float)kamera.getCamPosition()[j]));
+                }
             }
 
             if (texture != null) {
 
-                uj_int = 0x43584554;
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
+                writeIntLE(str, 0x43584554);
 
-                bajtlista.add((byte) 5);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 'P');
-                bajtlista.add((byte) 'a');
-                bajtlista.add((byte) 'p');
-                bajtlista.add((byte) 'e');
-                bajtlista.add((byte) 'r');
+                str.write(5);
+                str.write(0);
+                str.write(0);
+                str.write(0);
+                str.write('P');
+                str.write('a');
+                str.write('p');
+                str.write('e');
+                str.write('r');
 
                 long u = 0;
                 File teximg = new File(filename + "-texture.png");
@@ -260,47 +150,18 @@ public class Export {
 
                 ImageIO.write(texture, "png", teximg);
 
-                bajtlista.add((byte) teximg.getName().length());
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                for (int i = 0; i < teximg.getName().length(); i++) {
-                    bajtlista.add((byte) teximg.getName().charAt(i));
-                }
+                byte[] teximgname = teximg.getName().getBytes();
+                writeIntLE(str, teximgname.length);
+                str.write(teximgname);
 
                 //the UV mapping is defined by the vertices in the paper space
                 for (int i = 0; i < origami.getVerticesSize(); i++) {
-
-                    uj_int = Float.floatToIntBits((float) (origami.getVertices2d().get(i)[0] / origami.paperWidth()));
-                    bajtlista.add((byte) (uj_int));
-                    bajtlista.add((byte) (uj_int >>> 8));
-                    bajtlista.add((byte) (uj_int >>> 16));
-                    bajtlista.add((byte) (uj_int >>> 24));
-
-                    uj_int = Float.floatToIntBits((float) (1 - origami.getVertices2d().get(i)[1] / origami.paperHeight()));
-                    bajtlista.add((byte) (uj_int));
-                    bajtlista.add((byte) (uj_int >>> 8));
-                    bajtlista.add((byte) (uj_int >>> 16));
-                    bajtlista.add((byte) (uj_int >>> 24));
+                    writeFloatLE(str, (float) (origami.getVertices2d().get(i)[0] / origami.paperWidth()));
+                    writeFloatLE(str, (float) (1 - origami.getVertices2d().get(i)[1] / origami.paperHeight()));
                 }
             }
 
-            byte[] bajtok = new byte[bajtlista.size()];
-            for (int i = 0; i < bajtlista.size(); i++) {
-
-                bajtok[i] = bajtlista.get(i);
-            }
-
-            File ctm = new File(filename);
-            if (ctm.exists()) {
-                ctm.delete();
-            }
-
-            FileOutputStream str = new FileOutputStream(ctm);
-
-            str.write(bajtok);
             System.out.println(str.getChannel().position() + " bytes written to " + filename);
-            str.close();
             kamera.unadjust(origami);
 
         } catch (IOException exc) {
