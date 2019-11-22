@@ -3,12 +3,7 @@ package origamieditor3d.io;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
@@ -107,7 +102,6 @@ public class Export {
 
             //Háromszögek
             for (int i = 0; i < origami.getPolygonsSize(); i++) {
-
                 if (origami.isNonDegenerate(i)) {
                     for (int ii = 1; ii < origami.getPolygons().get(i).size() - 1; ii++) {
                         writeIntLE(str, origami.getPolygons().get(i).get(0));
@@ -128,7 +122,6 @@ public class Export {
             }
 
             if (texture != null) {
-
                 writeIntLE(str, 0x43584554);
 
                 writeIntLE(str, 0x00000005);
@@ -170,7 +163,7 @@ public class Export {
                 StandardOpenOption.WRITE,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING);
-             OutputStream str = Channels.newOutputStream(channel)) {
+             Writer writer = Channels.newWriter(channel, StandardCharsets.UTF_8.toString())) {
 
             Origami origami1 = origami.copy();
 
@@ -180,42 +173,27 @@ public class Export {
             int bajtszam = 0;
 
             //Megszámoljuk, hány mûvelet nem lesz külön feltüntetve
-            int ures_muveletek = 0;
             ArrayList<Integer> UresIndexek = new ArrayList<>();
 
             for (int i = 0; i < origami1.getHistory().size(); i++) {
-
-                if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION) {
-
-                    if (i < origami1.getHistory().size() - 1) {
-
-                        if (origami1.getHistory().get(i + 1).foldID == Origami.FoldingAction.FOLD_ROTATION
-                                && origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint
-                                && origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal) {
-                            ures_muveletek++;
+                if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_CREASE) {
+                    UresIndexek.add(i);
+                } else if (i < origami1.getHistory().size() - 1 && origami1.getHistory().get(i).foldID == origami1.getHistory().get(i+1).foldID) {
+                    if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION) {
+                        if (origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint &&
+                                origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal) {
                             UresIndexek.add(i + 1);
                         }
-                    }
-                } else if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
-
-                    if (i < origami1.getHistory().size() - 1) {
-
-                        if (origami1.getHistory().get(i + 1).foldID == Origami.FoldingAction.FOLD_ROTATION_P
-                                && origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint
+                    } else if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
+                        if (origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint
                                 && origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal
                                 && origami1.getHistory().get(i + 1).polygonIndex == origami1.getHistory().get(i).polygonIndex) {
-                            ures_muveletek++;
                             UresIndexek.add(i + 1);
                         }
                     }
-                } else if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_CREASE) {
-
-                    ures_muveletek++;
-                    UresIndexek.add(i);
                 }
             }
 
-            int forgatasok = 1;
             //Azok a lépések, amikhez szemszögváltás kell
             ArrayList<Integer> ForgatasIndexek = new ArrayList<>();
             //A szemszögváltások függôleges forgásszögei
@@ -240,13 +218,10 @@ public class Export {
                     kamera.setCamDirection(new double[]{0, 0, 1});
                 }
 
-                kamera.setCamDirection(new double[]{kamera.getCamDirection()[0] / Geometry.vectorLength(kamera.getCamDirection()),
-                    kamera.getCamDirection()[1] / Geometry.vectorLength(kamera.getCamDirection()),
-                    kamera.getCamDirection()[2] / Geometry.vectorLength(kamera.getCamDirection())});
+                kamera.setCamDirection(Geometry.normalizeVector(kamera.getCamDirection()));
 
                 if (Geometry.vectorLength(Geometry.crossProduct(regiVaszonNV, kamera.getCamDirection())) > .00000001) {
 
-                    forgatasok++;
                     ForgatasIndexek.add(i);
                     double cos = Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) / Geometry.vectorLength(regiVaszonNV) / Geometry.vectorLength(kamera.getCamDirection());
                     ForgatasSzogek.add((int) (Math.acos(cos >= -1 && cos <= 1 ? cos : 1) / Math.PI * 180));
@@ -255,34 +230,24 @@ public class Export {
             ForgatasIndexek.add(origami1.getHistory().size());
 
             //Egy oldalon 6 cella van (papírmérettôl függetlenül)
-            int cellak_szama = origami1.getHistory().size() + forgatasok - ures_muveletek + 2;
+            int cellak_szama = origami1.getHistory().size() + ForgatasIndexek.size() - UresIndexek.size() + 2;
 
             //Fejléc
             String fajl = "";
-            fajl += "%PDF-1.3";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl += "%PDF-1.3\n\n";
 
             //Katalógus
             Offszetek.add(fajl.length());
-            fajl += "1 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Type /Catalog";
-            fajl += (char) 10;
-            fajl += " /Pages 2 0 R";
-            fajl += (char) 10;
-            fajl += ">>";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl += "1 0 obj\n";
+            fajl += "<< /Type /Catalog\n";
+            fajl += " /Pages 2 0 R\n";
+            fajl += ">>\n";
+            fajl += "endobj\n\n";
 
             //Kötet
             Offszetek.add(fajl.length());
-            fajl += "2 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Type /Pages";
-            fajl += (char) 10;
+            fajl += "2 0 obj\n";
+            fajl += "<< /Type /Pages\n";
             fajl += "/Kids [";
             fajl += "3 0 R";
 
@@ -291,46 +256,28 @@ public class Export {
 
                 fajl += " " + Integer.toString(i + 3) + " 0 R";
             }
-            fajl += "]";
-            fajl += (char) 10;
-            fajl += "/Count " + Integer.toString((int) Math.ceil((double) cellak_szama / 6));
-            fajl += (char) 10;
-            fajl += "/MediaBox [0 0 " + Integer.toString(page_width) + " " + Integer.toString(page_height) + "]";
-            fajl += (char) 10;
-            fajl += ">>";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl += "]\n";
+            fajl += "/Count " + Integer.toString((int) Math.ceil((double) cellak_szama / 6)) + "\n";
+            fajl += "/MediaBox [0 0 " + Integer.toString(page_width) + " " + Integer.toString(page_height) + "]\n";
+            fajl += ">>\n";
+            fajl += "endobj\n\n";
 
             //Oldalak
             for (int i = 0; i < (int) Math.ceil((double) cellak_szama / 6); i++) {
 
                 Offszetek.add(fajl.length());
-                fajl += "" + Integer.toString(i + 3) + " 0 obj";
-                fajl += (char) 10;
-                fajl += "<< /Type /Page";
-                fajl += (char) 10;
-                fajl += "/Parent 2 0 R";
-                fajl += (char) 10;
-                fajl += "/Resources";
-                fajl += (char) 10;
-                fajl += "<< /Font";
-                fajl += (char) 10;
-                fajl += "<< /F1";
-                fajl += (char) 10;
-                fajl += "<< /Type /Font";
-                fajl += (char) 10;
-                fajl += "/Subtype /Type1";
-                fajl += (char) 10;
-                fajl += "/BaseFont /Courier";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
+                fajl += "" + Integer.toString(i + 3) + " 0 obj\n";
+                fajl += "<< /Type /Page\n";
+                fajl += "/Parent 2 0 R\n";
+                fajl += "/Resources\n";
+                fajl += "<< /Font\n";
+                fajl += "<< /F1\n";
+                fajl += "<< /Type /Font\n";
+                fajl += "/Subtype /Type1\n";
+                fajl += "/BaseFont /Courier\n";
+                fajl += ">>\n";
+                fajl += ">>\n";
+                fajl += ">>\n";
                 fajl += "/Contents[";
 
                 //Egy oldalon általánosan 6 kép és 6 szöveg objektum van
@@ -346,72 +293,45 @@ public class Export {
                     fajl += Integer.toString(ii + 3) + " 0 R";
                     fajl += " " + Integer.toString(ii + cellak_szama + 3) + " 0 R";
                 }
-                fajl += "]";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
-                fajl += "endobj";
-                fajl += (char) 10;
-                fajl += (char) 10;
+                fajl += "]\n";
+                fajl += ">>\n";
+                fajl += "endobj\n\n";
             }
 
             //A cím a megadott fájlnév
             Offszetek.add(fajl.length());
             String stream;
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 18 Tf";
-            stream += (char) 10;
-            stream += "100 800 Td";
-            stream += (char) 10;
+            stream = "BT\n";
+            stream += "/F1 18 Tf\n";
+            stream += "100 800 Td\n";
             stream += "(";
             for (int i = 0; i < 18 - title.length() / 2; i++) {
                 stream += " ";
             }
-            stream += title + ") Tj";
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 3) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
+            stream += title + ") Tj\n";
+            stream += "ET\n";
+            fajl += Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 3) + " 0 obj\n";
+            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+            fajl += "stream\n";
             fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl += "endstream\n";
+            fajl += "endobj\n\n";
 
             //A cím alatti két üres cellában van helyünk a reklámozásra
             Offszetek.add(fajl.length());
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 12 Tf";
-            stream += (char) 10;
-            stream += Integer.toString((int) (page_width - 2 * figure_frame) / 4) + " 760 Td";
-            stream += (char) 10;
-            stream += "14 TL";
-            stream += (char) 10;
-            stream += Instructor.getString("disclaimer", Constants.VERSION);
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 4) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
+            stream = "BT\n";
+            stream += "/F1 12 Tf\n";
+            stream += Integer.toString((int) (page_width - 2 * figure_frame) / 4) + " 760 Td\n";
+            stream += "14 TL\n";
+            stream += Instructor.getString("disclaimer", Constants.VERSION) + "\n";
+            stream += "ET\n";
+            fajl += Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 4) + " 0 obj\n";
+            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+            fajl += "stream\n";
             fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
-            str.write(fajl.getBytes(StandardCharsets.UTF_8));
+            fajl += "endstream\n";
+            fajl += "endobj\n\n";
+            writer.write(fajl);
             bajtszam += fajl.length();
             fajl = "";
 
@@ -481,22 +401,15 @@ public class Export {
                     stream = "q";
                     stream += " ";
                     stream += kep;
-                    stream += "Q";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
+                    stream += "Q\n";
+                    fajl += Integer.toString(objindex) + " 0 obj\n";
+                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+                    fajl += "stream\n";
                     fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
+                    fajl += "endstream\n";
+                    fajl += "endobj\n\n";
                     objindex++;
-                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
+                    writer.write(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -603,22 +516,15 @@ public class Export {
                     stream = "q";
                     stream += " ";
                     stream += kep;
-                    stream += "Q";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
+                    stream += "Q\n";
+                    fajl += Integer.toString(objindex) + " 0 obj\n";
+                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+                    fajl += "stream\n";
                     fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
+                    fajl += "endstream\n";
+                    fajl += "endobj\n\n";
                     objindex++;
-                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
+                    writer.write(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -667,66 +573,43 @@ public class Export {
                     break;
             }
             Offszetek.add(bajtszam);
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 12 Tf";
-            stream += (char) 10;
+            stream = "BT\n";
+            stream += "/F1 12 Tf\n";
             stream += Integer.toString((int) (page_width - 2 * figure_frame) / 4) + " "
                     + Integer.toString(722 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
                             + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14)
-                    + " Td";
-            stream += (char) 10;
-            stream += "12 TL";
-            stream += (char) 10;
-            stream += Instructor.getString("difficulty", dif, difname);
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString(objindex) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
+                    + " Td\n";
+            stream += "12 TL\n";
+            stream += Instructor.getString("difficulty", dif, difname) + "\n";
+            stream += "ET\n";
+            fajl += Integer.toString(objindex) + " 0 obj\n";
+            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+            fajl += "stream\n";
             fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl += "endstream\n";
+            fajl += "endobj\n\n";
             objindex++;
-            str.write(fajl.getBytes(StandardCharsets.UTF_8));
+            writer.write(fajl);
             bajtszam += fajl.length();
             fajl = "";
 
             Offszetek.add(bajtszam);
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 12 Tf";
-            stream += (char) 10;
+            stream = "BT\n";
+            stream += "/F1 12 Tf\n";
             stream += Integer.toString((int) (page_width - 2 * figure_frame) / 4) + " "
                     + Integer.toString(736 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
                             + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14)
-                    + " Td";
-            stream += (char) 10;
-            stream += Instructor.getString("steps", cellak_szama - 2) + "Tj";
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString(objindex) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
+                    + " Td\n";
+            stream += Instructor.getString("steps", cellak_szama - 2) + "Tj\n";
+            stream += "ET\n";
+            fajl += Integer.toString(objindex) + " 0 obj\n";
+            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+            fajl += "stream\n";
             fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl += "endstream\n";
+            fajl += "endobj\n\n";
             objindex++;
-            str.write(fajl.getBytes(StandardCharsets.UTF_8));
+            writer.write(fajl);
             bajtszam += fajl.length();
             fajl = "";
 
@@ -789,31 +672,19 @@ public class Export {
                     }
 
                     Offszetek.add(bajtszam);
-                    stream = "BT";
-                    stream += (char) 10;
-                    stream += "/F1 10 Tf";
-                    stream += (char) 10;
-                    stream += koo + " Td";
-                    stream += (char) 10;
-                    stream += "12 TL";
-                    stream += (char) 10;
-                    stream += utasitas;
-                    stream += (char) 10;
-                    stream += "ET";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex + sorszam - 2) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
+                    stream = "BT\n";
+                    stream += "/F1 10 Tf\n";
+                    stream += koo + " Td\n";
+                    stream += "12 TL\n";
+                    stream += utasitas + "\n";
+                    stream += "ET\n";
+                    fajl += Integer.toString(objindex + sorszam - 2) + " 0 obj\n";
+                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+                    fajl += "stream\n";
                     fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
-                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
+                    fajl += "endstream\n";
+                    fajl += "endobj\n\n";
+                    writer.write(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -1148,31 +1019,19 @@ public class Export {
                     }
 
                     Offszetek.add(bajtszam);
-                    stream = "BT";
-                    stream += (char) 10;
-                    stream += "/F1 10 Tf";
-                    stream += (char) 10;
-                    stream += koo + " Td";
-                    stream += (char) 10;
-                    stream += "12 TL";
-                    stream += (char) 10;
-                    stream += utasitas;
-                    stream += (char) 10;
-                    stream += "ET";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex + sorszam - 2) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
+                    stream = "BT\n";
+                    stream += "/F1 10 Tf\n";
+                    stream += koo + " Td\n";
+                    stream += "12 TL\n";
+                    stream += utasitas + "\n";
+                    stream += "ET\n";
+                    fajl += Integer.toString(objindex + sorszam - 2) + " 0 obj\n";
+                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>\n";
+                    fajl += "stream\n";
                     fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
-                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
+                    fajl += "endstream\n";
+                    fajl += "endobj\n\n";
+                    writer.write(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -1180,12 +1039,9 @@ public class Export {
 
             int xroffszet = bajtszam;
 
-            fajl += "xref";
-            fajl += (char) 10;
-            fajl += "0 " + Integer.toString(Offszetek.size());
-            fajl += (char) 10;
-            fajl += "0000000000 65535 f ";
-            fajl += (char) 10;
+            fajl += "xref\n";
+            fajl += "0 " + Integer.toString(Offszetek.size()) + "\n";
+            fajl += "0000000000 65535 f \n";
 
             for (int i = 1; i < Offszetek.size(); i++) {
 
@@ -1193,25 +1049,18 @@ public class Export {
                     fajl += "0";
                 }
                 fajl += Integer.toString(Offszetek.get(i));
-                fajl += " 00000 n ";
-                fajl += (char) 10;
+                fajl += " 00000 n \n";
             }
 
-            fajl += "trailer";
-            fajl += (char) 10;
-            fajl += "<< /Root 1 0 R";
-            fajl += (char) 10;
-            fajl += "/Size " + Integer.toString(Offszetek.size());
-            fajl += (char) 10;
-            fajl += ">>";
-            fajl += (char) 10;
-            fajl += "startxref";
-            fajl += (char) 10;
-            fajl += Integer.toString(xroffszet);
-            fajl += (char) 10;
+            fajl += "trailer\n";
+            fajl += "<< /Root 1 0 R\n";
+            fajl += "/Size " + Integer.toString(Offszetek.size()) + "\n";
+            fajl += ">>\n";
+            fajl += "startxref\n";
+            fajl += Integer.toString(xroffszet) + "\n";
             fajl += "%%EOF";
 
-            str.write(fajl.getBytes(StandardCharsets.UTF_8));
+            writer.write(fajl);
             System.out.println(channel.position() + " bytes written to " + filename);
 
         } catch (Exception exc) {
