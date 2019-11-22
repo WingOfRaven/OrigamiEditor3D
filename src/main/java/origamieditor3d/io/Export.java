@@ -373,35 +373,7 @@ public class Export {
 
                 if (!UresIndexek.contains(i) && i < origami1.getHistory().size()) {
 
-                    double[] regiVaszonNV = kamera.getCamDirection();
-
-                    kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
-                            new double[]{0, 1, 0}));
-
-                    if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
-                        kamera.setCamDirection(new double[]{0, 0, 1});
-                    }
-
-                    kamera.setCamDirection(new double[]{kamera.getCamDirection()[0] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[1] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[2] / Geometry.vectorLength(kamera.getCamDirection())});
-
-                    kamera.setYAxis(new double[]{0, 1, 0});
-                    kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
-
-                    kamera.setXAxis(new double[]{kamera.getXAxis()[0] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[1] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[2] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom()});
-
-                    kamera.setYAxis(new double[]{kamera.getYAxis()[0] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[1] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[2] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom()});
-
-                    if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ForgatasIndexek.contains(i)) {
-
-                        kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
-                        kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
-                    }
+                    setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
 
                     int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
                     x = page_width / 4 * (2*(position%2)+1);
@@ -537,35 +509,7 @@ public class Export {
 
                 if (!UresIndexek.contains(i) && i < origami1.getHistory().size()) {
 
-                    double[] regiVaszonNV = kamera.getCamDirection();
-
-                    kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
-                            new double[]{0, 1, 0}));
-
-                    if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
-                        kamera.setCamDirection(new double[]{0, 0, 1});
-                    }
-
-                    kamera.setCamDirection(new double[]{kamera.getCamDirection()[0] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[1] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[2] / Geometry.vectorLength(kamera.getCamDirection())});
-
-                    kamera.setYAxis(new double[]{0, 1, 0});
-                    kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
-
-                    kamera.setXAxis(new double[]{kamera.getXAxis()[0] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[1] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[2] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom()});
-
-                    kamera.setYAxis(new double[]{kamera.getYAxis()[0] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[1] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[2] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom()});
-
-                    if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ForgatasIndexek.contains(i)) {
-
-                        kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
-                        kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
-                    }
+                    setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
 
                     switch (origami1.getHistory().get(i).foldID) {
 
@@ -768,6 +712,32 @@ public class Export {
 
         } catch (Exception exc) {
             throw OrigamiException.H005;
+        }
+    }
+
+    private static void setCameraDirection(Camera kamera, Origami origami1, int i, boolean ignoreSign) {
+        double[] regiVaszonNV = kamera.getCamDirection();
+
+        kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
+                new double[]{0, 1, 0}));
+
+        if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
+            kamera.setCamDirection(new double[]{0, 0, 1});
+        }
+
+        kamera.setCamDirection(Geometry.normalizeVector(kamera.getCamDirection()));
+
+        kamera.setYAxis(new double[]{0, 1, 0});
+        kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
+
+        kamera.setXAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getXAxis()), kamera.getZoom()));
+
+        kamera.setYAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getYAxis()), kamera.getZoom()));
+
+        if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ignoreSign) {
+
+            kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
+            kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
         }
     }
 
