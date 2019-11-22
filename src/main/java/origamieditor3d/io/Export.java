@@ -51,11 +51,10 @@ public class Export {
 
     static public void exportCTM(Origami origami, String filename, BufferedImage texture) throws Exception {
 
-        try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(filename),
+        try (DataOutputStream str = new DataOutputStream(Files.newOutputStream(Paths.get(filename),
                 StandardOpenOption.WRITE,
                 StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-             OutputStream str = Channels.newOutputStream(channel)) {
+                StandardOpenOption.TRUNCATE_EXISTING))) {
 
             Camera kamera = new Camera(0, 0, 1);
             kamera.adjust(origami);
@@ -149,7 +148,7 @@ public class Export {
                 }
             }
 
-            System.out.println(channel.position() + " bytes written to " + filename);
+            System.out.println(str.size() + " bytes written to " + filename);
             kamera.unadjust(origami);
 
         } catch (IOException exc) {
@@ -337,7 +336,7 @@ public class Export {
 
             //Ez már élesben megy
             origami1.reset();
-            Double maxdim = origami1.circumscribedSquareSize();
+            double maxdim = origami1.circumscribedSquareSize();
             if (maxdim == .0) {
                 maxdim = 1.;
             }
@@ -548,30 +547,7 @@ public class Export {
             }
 
             int dif = OrigamiGen1.difficultyLevel(origami1.difficulty());
-            String difname = null;
-            switch (dif) {
-                case 0:
-                    difname = Instructor.getString("level0");
-                    break;
-                case 1:
-                    difname = Instructor.getString("level1");
-                    break;
-                case 2:
-                    difname = Instructor.getString("level2");
-                    break;
-                case 3:
-                    difname = Instructor.getString("level3");
-                    break;
-                case 4:
-                    difname = Instructor.getString("level4");
-                    break;
-                case 5:
-                    difname = Instructor.getString("level5");
-                    break;
-                case 6:
-                    difname = Instructor.getString("level6");
-                    break;
-            }
+            String difname = Instructor.getString("level" + dif);
             Offszetek.add(bajtszam);
             stream = "BT\n";
             stream += "/F1 12 Tf\n";
@@ -732,98 +708,23 @@ public class Export {
                                     break;
 
                                 case -1:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("fold_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("fold_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("fold_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("fold_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
+                                    utasitas = Instructor.getString("fold_" + kamera.pdfLinerDir(siknv), sorszam);
                                     break;
 
                                 case -2:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("fold/rev_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("fold/rev_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("fold/rev_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("fold/rev_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
+                                    utasitas = Instructor.getString("fold/rev_" + kamera.pdfLinerDir(siknv), sorszam);
                                     break;
 
                                 case -3:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("rev_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("rev_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("rev_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("rev_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
+                                    utasitas = Instructor.getString("rev_" + kamera.pdfLinerDir(siknv), sorszam);
                                     break;
 
                                 case -4:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("fold/sink_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("fold/sink_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("fold/sink_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("fold/sink_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
+                                    utasitas = Instructor.getString("fold/sink_" + kamera.pdfLinerDir(siknv), sorszam);
                                     break;
 
                                 case -5:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("rev/sink_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("rev/sink_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("rev/sink_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("rev/sink_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
+                                    utasitas = Instructor.getString("rev/sink_" + kamera.pdfLinerDir(siknv), sorszam);
                                     break;
 
                                 default:
@@ -846,23 +747,8 @@ public class Export {
                                 }
                                 j--;
                             }
-                            switch (kamera.pdfLinerDir(siknv)) {
 
-                                case Camera.PDF_NORTH:
-                                    utasitas = Instructor.getString("rotate_north", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                case Camera.PDF_EAST:
-                                    utasitas = Instructor.getString("rotate_east", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                case Camera.PDF_SOUTH:
-                                    utasitas = Instructor.getString("rotate_south", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                case Camera.PDF_WEST:
-                                    utasitas = Instructor.getString("rotate_west", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            utasitas = Instructor.getString("rotate_" + kamera.pdfLinerDir(siknv), sorszam, szog + origami1.getHistory().get(i).phi);
                             sorszam++;
                             break;
 
@@ -913,23 +799,7 @@ public class Export {
 
                         case Origami.FoldingAction.FOLD_MUTILATION:
                             siknv = origami1.getHistory().get(i).pnormal;
-                            switch (kamera.pdfLinerDir(siknv)) {
-
-                                case Camera.PDF_NORTH:
-                                    utasitas = Instructor.getString("cut_north", sorszam);
-                                    break;
-                                case Camera.PDF_EAST:
-                                    utasitas = Instructor.getString("cut_east", sorszam);
-                                    break;
-                                case Camera.PDF_SOUTH:
-                                    utasitas = Instructor.getString("cut_south", sorszam);
-                                    break;
-                                case Camera.PDF_WEST:
-                                    utasitas = Instructor.getString("cut_west", sorszam);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            utasitas = Instructor.getString("cut_" + kamera.pdfLinerDir(siknv), sorszam);
                             if (firstblood) {
                                 utasitas += Instructor.getString("cut_notice");
                                 firstblood = false;

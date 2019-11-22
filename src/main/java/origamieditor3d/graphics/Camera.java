@@ -544,6 +544,24 @@ public class Camera {
 		}
 	}
 
+	public enum PDFDirection {
+		PDF_NORTH("north"),
+		PDF_SOUTH("south"),
+		PDF_WEST("west"),
+		PDF_EAST("east");
+
+		private String name;
+
+		PDFDirection(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+	}
+
 	public String pfdLiner(int x, int y, double[] ppoint, double[] pnormal) {
 
 		String out = "0.4 0.4 0.4 RG [5 5] 0 d ";
@@ -552,7 +570,7 @@ public class Camera {
 		boolean lineto = false;
 		double bound = 100;
 
-		if (pdfLinerDir(pnormal) == 'J' || pdfLinerDir(pnormal) == 'B') {
+		if (pdfLinerDir(pnormal) == PDFDirection.PDF_EAST || pdfLinerDir(pnormal) == PDFDirection.PDF_WEST) {
 
 			double[] pdir_2D = new double[] { -pnormal_2D[1] / pnormal_2D[0], 1 };
 
@@ -667,12 +685,7 @@ public class Camera {
 		return out;
 	}
 
-	final static public int PDF_NORTH = 'F';
-	final static public int PDF_SOUTH = 'L';
-	final static public int PDF_WEST = 'B';
-	final static public int PDF_EAST = 'J';
-
-	public int pdfLinerDir(double[] pnormal) {
+	public PDFDirection pdfLinerDir(double[] pnormal) {
 
 		double[] pnormal_2D = projection0(pnormal);
 
@@ -680,22 +693,22 @@ public class Camera {
 
 			if (pnormal_2D[0] < -pnormal_2D[1]) {
 
-				return PDF_WEST;
+				return PDFDirection.PDF_WEST;
 			}
 			else {
 
-				return PDF_NORTH;
+				return PDFDirection.PDF_NORTH;
 			}
 		}
 		else {
 
 			if (pnormal_2D[0] < -pnormal_2D[1]) {
 
-				return PDF_SOUTH;
+				return PDFDirection.PDF_SOUTH;
 			}
 			else {
 
-				return PDF_EAST;
+				return PDFDirection.PDF_EAST;
 			}
 		}
 	}
