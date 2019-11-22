@@ -158,11 +158,10 @@ public class Export {
 
     static public void exportPDF(Origami origami, String filename, String title) throws Exception {
 
-        try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(filename),
+        try (DataOutputStream str = new DataOutputStream(Files.newOutputStream(Paths.get(filename),
                 StandardOpenOption.WRITE,
                 StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-             Writer writer = Channels.newWriter(channel, StandardCharsets.UTF_8.toString())) {
+                StandardOpenOption.TRUNCATE_EXISTING))) {
 
             Origami origami1 = origami.copy();
 
@@ -330,7 +329,7 @@ public class Export {
             fajl += stream;
             fajl += "endstream\n";
             fajl += "endobj\n\n";
-            writer.write(fajl);
+            str.writeBytes(fajl);
             bajtszam += fajl.length();
             fajl = "";
 
@@ -378,7 +377,7 @@ public class Export {
                     fajl += "endstream\n";
                     fajl += "endobj\n\n";
                     objindex++;
-                    writer.write(fajl);
+                    str.writeBytes(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -461,7 +460,7 @@ public class Export {
                     fajl += "endstream\n";
                     fajl += "endobj\n\n";
                     objindex++;
-                    writer.write(fajl);
+                    str.writeBytes(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -503,7 +502,7 @@ public class Export {
             fajl += "endstream\n";
             fajl += "endobj\n\n";
             objindex++;
-            writer.write(fajl);
+            str.writeBytes(fajl);
             bajtszam += fajl.length();
             fajl = "";
 
@@ -523,7 +522,7 @@ public class Export {
             fajl += "endstream\n";
             fajl += "endobj\n\n";
             objindex++;
-            writer.write(fajl);
+            str.writeBytes(fajl);
             bajtszam += fajl.length();
             fajl = "";
 
@@ -566,7 +565,7 @@ public class Export {
                     fajl += stream;
                     fajl += "endstream\n";
                     fajl += "endobj\n\n";
-                    writer.write(fajl);
+                    str.writeBytes(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -775,7 +774,7 @@ public class Export {
                     fajl += stream;
                     fajl += "endstream\n";
                     fajl += "endobj\n\n";
-                    writer.write(fajl);
+                    str.writeBytes(fajl);
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -804,8 +803,8 @@ public class Export {
             fajl += Integer.toString(xroffszet) + "\n";
             fajl += "%%EOF";
 
-            writer.write(fajl);
-            System.out.println(channel.position() + " bytes written to " + filename);
+            str.writeBytes(fajl);
+            System.out.println(str.size() + " bytes written to " + filename);
 
         } catch (Exception exc) {
             throw OrigamiException.H005;
