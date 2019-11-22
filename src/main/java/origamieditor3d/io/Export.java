@@ -810,18 +810,12 @@ public class Export {
 
                     fos.write(width / 2 + 1);
                     fos.write(0x80);
-                    for (int x = 0; x < width / 2; x++) {
+                    for (int x = 0; x < width; x++) {
 
-                        int rgb = img.getRGB(x, y) & 0xFFFFFF;
-                        int b = rgb % 0x100;
-                        int g = (rgb >>> 8) % 0x100;
-                        int r = rgb >>> 16;
-
-                        fos.write((((r * 5) / 256) * 25 + ((g * 5) / 256) * 5 + (b * 5) / 256));
-                    }
-                    fos.write(width - width / 2 + 1);
-                    fos.write(0x80);
-                    for (int x = width / 2; x < width; x++) {
+                        if (x == width / 2) {
+                            fos.write(width - width / 2 + 1);
+                            fos.write(0x80);
+                        }
 
                         int rgb = img.getRGB(x, y) & 0xFFFFFF;
                         int b = rgb % 0x100;
