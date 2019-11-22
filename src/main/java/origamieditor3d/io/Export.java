@@ -348,6 +348,8 @@ public class Export {
             //Az objektum indexe, ahol épp tartunk
             int objindex = (int) Math.ceil((double) cellak_szama / 6) + 5;
 
+
+
             //Ábrák
             for (int i = 0; i <= origami1.getHistory().size(); i++) {
 
@@ -356,41 +358,9 @@ public class Export {
 
                 if (ForgatasIndexek.contains(i)) {
 
-                    switch ((objindex - (int) Math.ceil((double) cellak_szama / 6)) % 6) {
-
-                        case 0:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 1:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 2:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 3:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 4:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 5:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        default:
-                            break;
-                    }
+                    int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
+                    x = page_width / 4 * (2*(position%2)+1);
+                    y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
 
                     kamera.adjust(origami1);
                     kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
@@ -445,41 +415,9 @@ public class Export {
                         kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
                     }
 
-                    switch ((objindex - (int) Math.ceil((double) cellak_szama / 6)) % 6) {
-
-                        case 0:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 1:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 2:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 3:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 4:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 5:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        default:
-                            break;
-                    }
+                    int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
+                    x = page_width / 4 * (2*(position%2)+1);
+                    y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
 
                     double[] sikpont;
                     double[] siknv;
@@ -611,41 +549,9 @@ public class Export {
                         sorszam++;
                     }
 
-                    switch ((sorszam + 1) % 6) {
-
-                        case 1:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 2:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 3:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 4:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 5:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 0:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        default:
-                            break;
-                    }
+                    int position = sorszam % 6;
+                    koo = (page_width / 2 * (position % 2) + (page_width / 2 - figure_frame) / 3) + " ";
+                    koo += Integer.toString(page_height / 3 * (2-position/2) + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
 
                     Offszetek.add(bajtszam);
                     stream = "BT\n";
@@ -852,41 +758,9 @@ public class Export {
                         }
                     }
 
-                    switch ((sorszam + 1) % 6) {
-
-                        case 1:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 2:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 3:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 4:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 5:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 0:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        default:
-                            break;
-                    }
+                    int position = sorszam % 6;
+                    koo = (page_width / 2 * (position % 2) + (page_width / 2 - figure_frame) / 3) + " ";
+                    koo += Integer.toString(page_height / 3 * (2-position/2) + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
 
                     Offszetek.add(bajtszam);
                     stream = "BT\n";
