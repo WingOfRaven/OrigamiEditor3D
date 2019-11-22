@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -166,14 +166,13 @@ public class Export {
 
     static public void exportPDF(Origami origami, String filename, String title) throws Exception {
 
-        try {
+        try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             OutputStream str = Channels.newOutputStream(channel)) {
 
             Origami origami1 = origami.copy();
-            File pdf = new File(filename);
-            if (pdf.exists()) {
-                pdf.delete();
-            }
-            FileOutputStream str = new FileOutputStream(pdf);
 
             //Itt tároljuk az objektumok offszeteit
             ArrayList<Integer> Offszetek = new ArrayList<>();
@@ -412,7 +411,7 @@ public class Export {
             fajl += "endobj";
             fajl += (char) 10;
             fajl += (char) 10;
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
+            str.write(fajl.getBytes(StandardCharsets.UTF_8));
             bajtszam += fajl.length();
             fajl = "";
 
@@ -497,7 +496,7 @@ public class Export {
                     fajl += (char) 10;
                     fajl += (char) 10;
                     objindex++;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
+                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -579,45 +578,20 @@ public class Export {
                     switch (origami1.getHistory().get(i).foldID) {
 
                         case Origami.FoldingAction.FOLD_REFLECTION:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
                         case Origami.FoldingAction.FOLD_ROTATION:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_REFLECTION_P:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_ROTATION_P:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
                         case Origami.FoldingAction.FOLD_CREASE:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
                         case Origami.FoldingAction.FOLD_MUTILATION:
                             sikpont = origami1.getHistory().get(i).ppoint;
                             siknv = origami1.getHistory().get(i).pnormal;
                             kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
                             break;
 
+                        case Origami.FoldingAction.FOLD_REFLECTION_P:
+                        case Origami.FoldingAction.FOLD_ROTATION_P:
                         case Origami.FoldingAction.FOLD_MUTILATION_P:
                             sikpont = origami1.getHistory().get(i).ppoint;
                             siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawSelection(x, y, sikpont, siknv, (int) origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
+                            kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
                             break;
 
                         default:
@@ -644,7 +618,7 @@ public class Export {
                     fajl += (char) 10;
                     fajl += (char) 10;
                     objindex++;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
+                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -721,7 +695,7 @@ public class Export {
             fajl += (char) 10;
             fajl += (char) 10;
             objindex++;
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
+            str.write(fajl.getBytes(StandardCharsets.UTF_8));
             bajtszam += fajl.length();
             fajl = "";
 
@@ -752,7 +726,7 @@ public class Export {
             fajl += (char) 10;
             fajl += (char) 10;
             objindex++;
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
+            str.write(fajl.getBytes(StandardCharsets.UTF_8));
             bajtszam += fajl.length();
             fajl = "";
 
@@ -839,7 +813,7 @@ public class Export {
                     fajl += "endobj";
                     fajl += (char) 10;
                     fajl += (char) 10;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
+                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -1198,7 +1172,7 @@ public class Export {
                     fajl += "endobj";
                     fajl += (char) 10;
                     fajl += (char) 10;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
+                    str.write(fajl.getBytes(StandardCharsets.UTF_8));
                     bajtszam += fajl.length();
                     fajl = "";
                 }
@@ -1237,9 +1211,8 @@ public class Export {
             fajl += (char) 10;
             fajl += "%%EOF";
 
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
-            System.out.println(str.getChannel().position() + " bytes written to " + filename);
-            str.close();
+            str.write(fajl.getBytes(StandardCharsets.UTF_8));
+            System.out.println(channel.position() + " bytes written to " + filename);
 
         } catch (Exception exc) {
             throw OrigamiException.H005;
