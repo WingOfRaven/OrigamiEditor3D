@@ -11,7 +11,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.Channels;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -53,12 +56,11 @@ public class Export {
 
     static public void exportCTM(Origami origami, String filename, BufferedImage texture) throws Exception {
 
-        File ctm = new File(filename);
-        if (ctm.exists()) {
-            ctm.delete();
-        }
-
-        try (FileOutputStream str = new FileOutputStream(filename)) {
+        try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             OutputStream str = Channels.newOutputStream(channel)) {
 
             Camera kamera = new Camera(0, 0, 1);
             kamera.adjust(origami);
@@ -129,15 +131,8 @@ public class Export {
 
                 writeIntLE(str, 0x43584554);
 
-                str.write(5);
-                str.write(0);
-                str.write(0);
-                str.write(0);
-                str.write('P');
-                str.write('a');
-                str.write('p');
-                str.write('e');
-                str.write('r');
+                writeIntLE(str, 0x00000005);
+                str.write("Paper".getBytes());
 
                 long u = 0;
                 File teximg = new File(filename + "-texture.png");
@@ -161,7 +156,7 @@ public class Export {
                 }
             }
 
-            System.out.println(str.getChannel().position() + " bytes written to " + filename);
+            System.out.println(channel.position() + " bytes written to " + filename);
             kamera.unadjust(origami);
 
         } catch (IOException exc) {
