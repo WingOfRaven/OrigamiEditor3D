@@ -708,7 +708,7 @@ public class Export {
         }
     }
 
-    static public void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename, boolean revolving) throws Exception {
+    static private void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename, boolean revolving) throws Exception {
 
         try (FileOutputStream fos = new FileOutputStream(filename)) {
 
