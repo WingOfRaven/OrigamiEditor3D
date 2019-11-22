@@ -153,6 +153,32 @@ public class Export {
         }
     }
 
+    private static void setCameraDirection(Camera kamera, Origami origami1, int i, boolean ignoreSign) {
+        double[] regiVaszonNV = kamera.getCamDirection();
+
+        kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
+                new double[]{0, 1, 0}));
+
+        if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
+            kamera.setCamDirection(new double[]{0, 0, 1});
+        }
+
+        kamera.setCamDirection(Geometry.normalizeVector(kamera.getCamDirection()));
+
+        kamera.setYAxis(new double[]{0, 1, 0});
+        kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
+
+        kamera.setXAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getXAxis()), kamera.getZoom()));
+
+        kamera.setYAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getYAxis()), kamera.getZoom()));
+
+        if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ignoreSign) {
+
+            kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
+            kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
+        }
+    }
+    
     static private void appendObjStreamPDF(StringBuilder builder, int objIndex, String stream) {
         builder.append(objIndex).append(" 0 obj\n");
         builder.append("<< /Length ").append(stream.length()).append(" >>\n");
@@ -679,32 +705,6 @@ public class Export {
 
         } catch (Exception exc) {
             throw OrigamiException.H005;
-        }
-    }
-
-    private static void setCameraDirection(Camera kamera, Origami origami1, int i, boolean ignoreSign) {
-        double[] regiVaszonNV = kamera.getCamDirection();
-
-        kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
-                new double[]{0, 1, 0}));
-
-        if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
-            kamera.setCamDirection(new double[]{0, 0, 1});
-        }
-
-        kamera.setCamDirection(Geometry.normalizeVector(kamera.getCamDirection()));
-
-        kamera.setYAxis(new double[]{0, 1, 0});
-        kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
-
-        kamera.setXAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getXAxis()), kamera.getZoom()));
-
-        kamera.setYAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getYAxis()), kamera.getZoom()));
-
-        if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ignoreSign) {
-
-            kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
-            kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
         }
     }
 
