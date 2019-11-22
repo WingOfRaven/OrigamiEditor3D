@@ -178,7 +178,7 @@ public class Export {
             kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
         }
     }
-    
+
     static private void appendObjStreamPDF(StringBuilder builder, int objIndex, String stream) {
         builder.append(objIndex).append(" 0 obj\n");
         builder.append("<< /Length ").append(stream.length()).append(" >>\n");
@@ -484,8 +484,6 @@ public class Export {
                 String utasitas = "";
                 String koo = "";
 
-                double[] siknv;
-
                 if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
 
                     if (ForgatasIndexek.contains(i)) {
@@ -503,10 +501,28 @@ public class Export {
 
                         setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
 
+                        String direction = null;
+
+                        switch (origami1.getHistory().get(i).foldID) {
+                            case Origami.FoldingAction.FOLD_REFLECTION:
+                            case Origami.FoldingAction.FOLD_ROTATION:
+                            case Origami.FoldingAction.FOLD_MUTILATION:
+                                double[] siknv = origami1.getHistory().get(i).pnormal;
+                                direction = kamera.pdfLinerDir(siknv).toString();
+                                break;
+                            case Origami.FoldingAction.FOLD_REFLECTION_P:
+                            case Origami.FoldingAction.FOLD_ROTATION_P:
+                            case Origami.FoldingAction.FOLD_MUTILATION_P:
+                                direction = "gray";
+                                break;
+                            default:
+                                break;
+                        }
+
                         switch (origami1.getHistory().get(i).foldID) {
 
                             case Origami.FoldingAction.FOLD_REFLECTION:
-                                siknv = origami1.getHistory().get(i).pnormal;
+                            case Origami.FoldingAction.FOLD_REFLECTION_P:
                                 switch (foldtypes.get(i)) {
 
                                     case 0:
@@ -514,27 +530,28 @@ public class Export {
                                         break;
 
                                     case -1:
-                                        utasitas = Instructor.getString("fold_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        utasitas = Instructor.getString("fold_" + direction, sorszam);
                                         break;
 
                                     case -2:
-                                        utasitas = Instructor.getString("fold/rev_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        utasitas = Instructor.getString("fold/rev_" + direction, sorszam);
                                         break;
 
                                     case -3:
-                                        utasitas = Instructor.getString("rev_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        utasitas = Instructor.getString("rev_" + direction, sorszam);
                                         break;
 
                                     case -4:
-                                        utasitas = Instructor.getString("fold/sink_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        utasitas = Instructor.getString("fold/sink_" + direction, sorszam);
                                         break;
 
                                     case -5:
-                                        utasitas = Instructor.getString("rev/sink_" + kamera.pdfLinerDir(siknv), sorszam);
+                                        utasitas = Instructor.getString("rev/sink_" + direction, sorszam);
                                         break;
 
                                     default:
-                                        utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
+                                        if (!direction.equals("gray"))
+                                            utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
                                         break;
                                 }
 
@@ -542,59 +559,19 @@ public class Export {
                                 break;
 
                             case Origami.FoldingAction.FOLD_ROTATION:
-                                siknv = origami1.getHistory().get(i).pnormal;
+                            case Origami.FoldingAction.FOLD_ROTATION_P:
                                 int szog = 0;
                                 int j = i - 1;
                                 while (UresIndexek.contains(j)) {
 
-                                    if (origami1.getHistory().get(j).foldID == Origami.FoldingAction.FOLD_ROTATION) {
+                                    if (origami1.getHistory().get(j).foldID == origami1.getHistory().get(i).foldID) {
 
                                         szog += origami1.getHistory().get(j).phi;
                                     }
                                     j--;
                                 }
 
-                                utasitas = Instructor.getString("rotate_" + kamera.pdfLinerDir(siknv), sorszam, szog + origami1.getHistory().get(i).phi);
-                                sorszam++;
-                                break;
-
-                            case Origami.FoldingAction.FOLD_REFLECTION_P:
-                                switch (foldtypes.get(i)) {
-
-                                    case 0:
-                                        utasitas = Instructor.getString("no_fold", sorszam);
-                                        break;
-                                    case -1:
-                                        utasitas = Instructor.getString("fold_gray", sorszam);
-                                        break;
-                                    case -2:
-                                        utasitas = Instructor.getString("fold/rev_gray", sorszam);
-                                        break;
-                                    case -3:
-                                        utasitas = Instructor.getString("rev_gray", sorszam);
-                                        break;
-                                    case -4:
-                                        utasitas = Instructor.getString("fold/sink_gray", sorszam);
-                                        break;
-                                    case -5:
-                                        utasitas = Instructor.getString("rev/sink_gray", sorszam);
-                                        break;
-                                }
-                                sorszam++;
-                                break;
-
-                            case Origami.FoldingAction.FOLD_ROTATION_P:
-                                int szog1 = 0;
-                                int j1 = i - 1;
-                                while (UresIndexek.contains(j1)) {
-
-                                    if (origami1.getHistory().get(j1).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
-
-                                        szog1 += origami1.getHistory().get(j1).phi;
-                                    }
-                                    j1--;
-                                }
-                                utasitas = Instructor.getString("rotate_gray", sorszam, szog1 + origami1.getHistory().get(i).phi);
+                                utasitas = Instructor.getString("rotate_" + direction, sorszam, szog + origami1.getHistory().get(i).phi);
                                 sorszam++;
                                 break;
 
@@ -604,17 +581,8 @@ public class Export {
                                 break;
 
                             case Origami.FoldingAction.FOLD_MUTILATION:
-                                siknv = origami1.getHistory().get(i).pnormal;
-                                utasitas = Instructor.getString("cut_" + kamera.pdfLinerDir(siknv), sorszam);
-                                if (firstblood) {
-                                    utasitas += Instructor.getString("cut_notice");
-                                    firstblood = false;
-                                }
-                                sorszam++;
-                                break;
-
                             case Origami.FoldingAction.FOLD_MUTILATION_P:
-                                utasitas = Instructor.getString("cut_gray", sorszam);
+                                utasitas = Instructor.getString("cut_" + direction, sorszam);
                                 if (firstblood) {
                                     utasitas += Instructor.getString("cut_notice");
                                     firstblood = false;
