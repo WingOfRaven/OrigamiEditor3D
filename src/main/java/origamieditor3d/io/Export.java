@@ -3,17 +3,13 @@ package origamieditor3d.io;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
@@ -38,9 +34,24 @@ public class Export {
     final static public int page_height = 842;
     final static public int figure_frame = 200;
 
+    static private void writeIntLE(OutputStream out, int value) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(value);
+        out.write(buffer.array());
+    }
+
+    static private void writeFloatLE(OutputStream out, float value) throws IOException {
+        writeIntLE(out, Float.floatToIntBits(value));
+    }
+
     static public void exportCTM(Origami origami, String filename, BufferedImage texture) throws Exception {
 
-        try {
+        try (OutputStream os = Files.newOutputStream(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream str = new DataOutputStream(os)) {
 
             Camera kamera = new Camera(0, 0, 1);
             kamera.adjust(origami);
@@ -53,201 +64,64 @@ public class Export {
                 }
             }
 
-            ArrayList<Byte> bajtlista = new ArrayList<>();
-            int uj_int;
-
             //OCTM
-            uj_int = 0x4d54434f;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x4d54434f);
 
             //5. verzió
-            uj_int = 0x00000005;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00000005);
 
             //RAW tömörítés
-            uj_int = 0x00574152;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00574152);
 
             //Pontok száma
-            uj_int = origami.getVerticesSize();
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, origami.getVerticesSize());
 
             //Háromszögek száma
-            uj_int = haromszogek_hossz;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, haromszogek_hossz);
 
             //UV térképek száma
-            uj_int = texture == null ? 0 : 1;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, texture == null ? 0 : 1);
 
             //Attibrútumtérképek száma
-            uj_int = 0x00000000;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00000000);
 
             //Csúcsonkénti merôlegesek nincsenek
-            uj_int = 0x00000000;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x00000000);
 
             //Reklám
-            uj_int = 0x00000020;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
-
-            uj_int = 0x43726561;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x74656420;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x77697468;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x204f7269;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x67616d69;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x20456469;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x746f7220;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
-
-            uj_int = 0x33442e20;
-            bajtlista.add((byte) (uj_int >>> 24));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int));
+            byte[] comment = "Created with Origami Editor 3D. ".getBytes();
+            writeIntLE(str, comment.length);
+            str.write(comment);
 
             //INDX
-            uj_int = 0x58444e49;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x58444e49);
 
             //Háromszögek
             for (int i = 0; i < origami.getPolygonsSize(); i++) {
-
                 if (origami.isNonDegenerate(i)) {
-
                     for (int ii = 1; ii < origami.getPolygons().get(i).size() - 1; ii++) {
-
-                        uj_int = origami.getPolygons().get(i).get(0);
-                        bajtlista.add((byte) (uj_int));
-                        bajtlista.add((byte) (uj_int >>> 8));
-                        bajtlista.add((byte) (uj_int >>> 16));
-                        bajtlista.add((byte) (uj_int >>> 24));
-
-                        uj_int = origami.getPolygons().get(i).get(ii);
-                        bajtlista.add((byte) (uj_int));
-                        bajtlista.add((byte) (uj_int >>> 8));
-                        bajtlista.add((byte) (uj_int >>> 16));
-                        bajtlista.add((byte) (uj_int >>> 24));
-
-                        uj_int = origami.getPolygons().get(i).get(ii + 1);
-                        bajtlista.add((byte) (uj_int));
-                        bajtlista.add((byte) (uj_int >>> 8));
-                        bajtlista.add((byte) (uj_int >>> 16));
-                        bajtlista.add((byte) (uj_int >>> 24));
+                        writeIntLE(str, origami.getPolygons().get(i).get(0));
+                        writeIntLE(str, origami.getPolygons().get(i).get(ii));
+                        writeIntLE(str, origami.getPolygons().get(i).get(ii + 1));
                     }
                 }
             }
 
             //VERT
-            uj_int = 0x54524556;
-            bajtlista.add((byte) (uj_int));
-            bajtlista.add((byte) (uj_int >>> 8));
-            bajtlista.add((byte) (uj_int >>> 16));
-            bajtlista.add((byte) (uj_int >>> 24));
+            writeIntLE(str, 0x54524556);
 
             //Csúcsok
             for (int i = 0; i < origami.getVerticesSize(); i++) {
-
-                uj_int = Float.floatToIntBits((float) origami.getVertices().get(i)[0] - (float) kamera.getCamPosition()[0]);
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
-
-                uj_int = Float.floatToIntBits((float) origami.getVertices().get(i)[1] - (float) kamera.getCamPosition()[1]);
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
-
-                uj_int = Float.floatToIntBits((float) origami.getVertices().get(i)[2] - (float) kamera.getCamPosition()[2]);
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
+                for (int j = 0; j < 3; j++) {
+                    writeFloatLE(str, (float) ((float)origami.getVertices().get(i)[j] - (float)kamera.getCamPosition()[j]));
+                }
             }
 
             if (texture != null) {
+                writeIntLE(str, 0x43584554);
 
-                uj_int = 0x43584554;
-                bajtlista.add((byte) (uj_int));
-                bajtlista.add((byte) (uj_int >>> 8));
-                bajtlista.add((byte) (uj_int >>> 16));
-                bajtlista.add((byte) (uj_int >>> 24));
-
-                bajtlista.add((byte) 5);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 'P');
-                bajtlista.add((byte) 'a');
-                bajtlista.add((byte) 'p');
-                bajtlista.add((byte) 'e');
-                bajtlista.add((byte) 'r');
+                writeIntLE(str, 0x00000005);
+                str.write("Paper".getBytes());
 
                 long u = 0;
                 File teximg = new File(filename + "-texture.png");
@@ -260,47 +134,18 @@ public class Export {
 
                 ImageIO.write(texture, "png", teximg);
 
-                bajtlista.add((byte) teximg.getName().length());
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                bajtlista.add((byte) 0);
-                for (int i = 0; i < teximg.getName().length(); i++) {
-                    bajtlista.add((byte) teximg.getName().charAt(i));
-                }
+                byte[] teximgname = teximg.getName().getBytes();
+                writeIntLE(str, teximgname.length);
+                str.write(teximgname);
 
                 //the UV mapping is defined by the vertices in the paper space
                 for (int i = 0; i < origami.getVerticesSize(); i++) {
-
-                    uj_int = Float.floatToIntBits((float) (origami.getVertices2d().get(i)[0] / origami.paperWidth()));
-                    bajtlista.add((byte) (uj_int));
-                    bajtlista.add((byte) (uj_int >>> 8));
-                    bajtlista.add((byte) (uj_int >>> 16));
-                    bajtlista.add((byte) (uj_int >>> 24));
-
-                    uj_int = Float.floatToIntBits((float) (1 - origami.getVertices2d().get(i)[1] / origami.paperHeight()));
-                    bajtlista.add((byte) (uj_int));
-                    bajtlista.add((byte) (uj_int >>> 8));
-                    bajtlista.add((byte) (uj_int >>> 16));
-                    bajtlista.add((byte) (uj_int >>> 24));
+                    writeFloatLE(str, (float) (origami.getVertices2d().get(i)[0] / origami.paperWidth()));
+                    writeFloatLE(str, (float) (1 - origami.getVertices2d().get(i)[1] / origami.paperHeight()));
                 }
             }
 
-            byte[] bajtok = new byte[bajtlista.size()];
-            for (int i = 0; i < bajtlista.size(); i++) {
-
-                bajtok[i] = bajtlista.get(i);
-            }
-
-            File ctm = new File(filename);
-            if (ctm.exists()) {
-                ctm.delete();
-            }
-
-            FileOutputStream str = new FileOutputStream(ctm);
-
-            str.write(bajtok);
-            System.out.println(str.getChannel().position() + " bytes written to " + filename);
-            str.close();
+            System.out.println(str.size() + " bytes written to " + filename);
             kamera.unadjust(origami);
 
         } catch (IOException exc) {
@@ -308,16 +153,50 @@ public class Export {
         }
     }
 
+    private static void setCameraDirection(Camera kamera, Origami origami1, int i, boolean ignoreSign) {
+        double[] regiVaszonNV = kamera.getCamDirection();
+
+        kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
+                new double[]{0, 1, 0}));
+
+        if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
+            kamera.setCamDirection(new double[]{0, 0, 1});
+        }
+
+        kamera.setCamDirection(Geometry.normalizeVector(kamera.getCamDirection()));
+
+        kamera.setYAxis(new double[]{0, 1, 0});
+        kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
+
+        kamera.setXAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getXAxis()), kamera.getZoom()));
+
+        kamera.setYAxis(Geometry.scalarMultiple(Geometry.normalizeVector(kamera.getYAxis()), kamera.getZoom()));
+
+        if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ignoreSign) {
+
+            kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
+            kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
+        }
+    }
+
+    static private void appendObjStreamPDF(StringBuilder builder, int objIndex, String stream) {
+        builder.append(objIndex).append(" 0 obj\n");
+        builder.append("<< /Length ").append(stream.length()).append(" >>\n");
+        builder.append("stream\n");
+        builder.append(stream);
+        builder.append("endstream\n");
+        builder.append("endobj\n\n");
+    }
+
     static public void exportPDF(Origami origami, String filename, String title) throws Exception {
 
-        try {
+        try (OutputStream os = Files.newOutputStream(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream str = new DataOutputStream(os)) {
 
             Origami origami1 = origami.copy();
-            File pdf = new File(filename);
-            if (pdf.exists()) {
-                pdf.delete();
-            }
-            FileOutputStream str = new FileOutputStream(pdf);
 
             //Itt tároljuk az objektumok offszeteit
             ArrayList<Integer> Offszetek = new ArrayList<>();
@@ -325,42 +204,27 @@ public class Export {
             int bajtszam = 0;
 
             //Megszámoljuk, hány mûvelet nem lesz külön feltüntetve
-            int ures_muveletek = 0;
             ArrayList<Integer> UresIndexek = new ArrayList<>();
 
             for (int i = 0; i < origami1.getHistory().size(); i++) {
-
-                if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION) {
-
-                    if (i < origami1.getHistory().size() - 1) {
-
-                        if (origami1.getHistory().get(i + 1).foldID == Origami.FoldingAction.FOLD_ROTATION
-                                && origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint
-                                && origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal) {
-                            ures_muveletek++;
+                if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_CREASE) {
+                    UresIndexek.add(i);
+                } else if (i < origami1.getHistory().size() - 1 && origami1.getHistory().get(i).foldID == origami1.getHistory().get(i+1).foldID) {
+                    if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION) {
+                        if (origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint &&
+                                origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal) {
                             UresIndexek.add(i + 1);
                         }
-                    }
-                } else if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
-
-                    if (i < origami1.getHistory().size() - 1) {
-
-                        if (origami1.getHistory().get(i + 1).foldID == Origami.FoldingAction.FOLD_ROTATION_P
-                                && origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint
+                    } else if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
+                        if (origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint
                                 && origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal
                                 && origami1.getHistory().get(i + 1).polygonIndex == origami1.getHistory().get(i).polygonIndex) {
-                            ures_muveletek++;
                             UresIndexek.add(i + 1);
                         }
                     }
-                } else if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_CREASE) {
-
-                    ures_muveletek++;
-                    UresIndexek.add(i);
                 }
             }
 
-            int forgatasok = 1;
             //Azok a lépések, amikhez szemszögváltás kell
             ArrayList<Integer> ForgatasIndexek = new ArrayList<>();
             //A szemszögváltások függôleges forgásszögei
@@ -385,13 +249,10 @@ public class Export {
                     kamera.setCamDirection(new double[]{0, 0, 1});
                 }
 
-                kamera.setCamDirection(new double[]{kamera.getCamDirection()[0] / Geometry.vectorLength(kamera.getCamDirection()),
-                    kamera.getCamDirection()[1] / Geometry.vectorLength(kamera.getCamDirection()),
-                    kamera.getCamDirection()[2] / Geometry.vectorLength(kamera.getCamDirection())});
+                kamera.setCamDirection(Geometry.normalizeVector(kamera.getCamDirection()));
 
                 if (Geometry.vectorLength(Geometry.crossProduct(regiVaszonNV, kamera.getCamDirection())) > .00000001) {
 
-                    forgatasok++;
                     ForgatasIndexek.add(i);
                     double cos = Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) / Geometry.vectorLength(regiVaszonNV) / Geometry.vectorLength(kamera.getCamDirection());
                     ForgatasSzogek.add((int) (Math.acos(cos >= -1 && cos <= 1 ? cos : 1) / Math.PI * 180));
@@ -400,83 +261,55 @@ public class Export {
             ForgatasIndexek.add(origami1.getHistory().size());
 
             //Egy oldalon 6 cella van (papírmérettôl függetlenül)
-            int cellak_szama = origami1.getHistory().size() + forgatasok - ures_muveletek + 2;
+            int cellak_szama = origami1.getHistory().size() + ForgatasIndexek.size() - UresIndexek.size() + 2;
 
             //Fejléc
-            String fajl = "";
-            fajl += "%PDF-1.3";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            StringBuilder fajl = new StringBuilder();
+            fajl.append("%PDF-1.3\n\n");
 
             //Katalógus
             Offszetek.add(fajl.length());
-            fajl += "1 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Type /Catalog";
-            fajl += (char) 10;
-            fajl += " /Pages 2 0 R";
-            fajl += (char) 10;
-            fajl += ">>";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl.append("1 0 obj\n");
+            fajl.append("<< /Type /Catalog\n");
+            fajl.append(" /Pages 2 0 R\n");
+            fajl.append(">>\n");
+            fajl.append("endobj\n\n");
 
             //Kötet
             Offszetek.add(fajl.length());
-            fajl += "2 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Type /Pages";
-            fajl += (char) 10;
-            fajl += "/Kids [";
-            fajl += "3 0 R";
+            fajl.append("2 0 obj\n");
+            fajl.append("<< /Type /Pages\n");
+            fajl.append("/Kids [");
+            fajl.append("3 0 R");
 
             //Az oldalak száma a cellák számának hatoda felfelé kerekítve
             for (int i = 1; i < (int) Math.ceil((double) cellak_szama / 6); i++) {
 
-                fajl += " " + Integer.toString(i + 3) + " 0 R";
+                fajl.append(" ").append(i + 3).append(" 0 R");
             }
-            fajl += "]";
-            fajl += (char) 10;
-            fajl += "/Count " + Integer.toString((int) Math.ceil((double) cellak_szama / 6));
-            fajl += (char) 10;
-            fajl += "/MediaBox [0 0 " + Integer.toString(page_width) + " " + Integer.toString(page_height) + "]";
-            fajl += (char) 10;
-            fajl += ">>";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            fajl.append("]\n");
+            fajl.append("/Count ").append((int) Math.ceil((double) cellak_szama / 6)).append("\n");
+            fajl.append("/MediaBox [0 0 ").append(page_width).append(" ").append(page_height).append("]\n");
+            fajl.append(">>\n");
+            fajl.append("endobj\n\n");
 
             //Oldalak
             for (int i = 0; i < (int) Math.ceil((double) cellak_szama / 6); i++) {
 
                 Offszetek.add(fajl.length());
-                fajl += "" + Integer.toString(i + 3) + " 0 obj";
-                fajl += (char) 10;
-                fajl += "<< /Type /Page";
-                fajl += (char) 10;
-                fajl += "/Parent 2 0 R";
-                fajl += (char) 10;
-                fajl += "/Resources";
-                fajl += (char) 10;
-                fajl += "<< /Font";
-                fajl += (char) 10;
-                fajl += "<< /F1";
-                fajl += (char) 10;
-                fajl += "<< /Type /Font";
-                fajl += (char) 10;
-                fajl += "/Subtype /Type1";
-                fajl += (char) 10;
-                fajl += "/BaseFont /Courier";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
-                fajl += "/Contents[";
+                fajl.append(i + 3).append(" 0 obj\n");
+                fajl.append("<< /Type /Page\n");
+                fajl.append("/Parent 2 0 R\n");
+                fajl.append("/Resources\n");
+                fajl.append("<< /Font\n");
+                fajl.append("<< /F1\n");
+                fajl.append("<< /Type /Font\n");
+                fajl.append("/Subtype /Type1\n");
+                fajl.append("/BaseFont /Courier\n");
+                fajl.append(">>\n");
+                fajl.append(">>\n");
+                fajl.append(">>\n");
+                fajl.append("/Contents[");
 
                 //Egy oldalon általánosan 6 kép és 6 szöveg objektum van
                 //A fájltest elsô felében a képek, a másodikban a szövegek vannak
@@ -486,83 +319,46 @@ public class Export {
                                 : (int) Math.ceil((double) cellak_szama / 6) + (i + 1) * 6);
                         ii++) {
                     if (ii != (int) Math.ceil((double) cellak_szama / 6) + i * 6) {
-                        fajl += " ";
+                        fajl.append(" ");
                     }
-                    fajl += Integer.toString(ii + 3) + " 0 R";
-                    fajl += " " + Integer.toString(ii + cellak_szama + 3) + " 0 R";
+                    fajl.append(ii + 3).append(" 0 R");
+                    fajl.append(" ").append(ii + cellak_szama + 3).append(" 0 R");
                 }
-                fajl += "]";
-                fajl += (char) 10;
-                fajl += ">>";
-                fajl += (char) 10;
-                fajl += "endobj";
-                fajl += (char) 10;
-                fajl += (char) 10;
+                fajl.append("]\n");
+                fajl.append(">>\n");
+                fajl.append("endobj\n\n");
             }
 
             //A cím a megadott fájlnév
             Offszetek.add(fajl.length());
-            String stream;
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 18 Tf";
-            stream += (char) 10;
-            stream += "100 800 Td";
-            stream += (char) 10;
-            stream += "(";
+            StringBuilder stream;
+            stream = new StringBuilder("BT\n");
+            stream.append("/F1 18 Tf\n");
+            stream.append("100 800 Td\n");
+            stream.append("(");
             for (int i = 0; i < 18 - title.length() / 2; i++) {
-                stream += " ";
+                stream.append(" ");
             }
-            stream += title + ") Tj";
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 3) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
-            fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            stream.append(title).append(") Tj\n");
+            stream.append("ET\n");
+            appendObjStreamPDF(fajl, (int) Math.ceil((double) cellak_szama / 6) + 3, stream.toString());
 
             //A cím alatti két üres cellában van helyünk a reklámozásra
             Offszetek.add(fajl.length());
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 12 Tf";
-            stream += (char) 10;
-            stream += Integer.toString((int) (page_width - 2 * figure_frame) / 4) + " 760 Td";
-            stream += (char) 10;
-            stream += "14 TL";
-            stream += (char) 10;
-            stream += Instructor.getString("disclaimer", Constants.VERSION);
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString((int) Math.ceil((double) cellak_szama / 6) + 4) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
-            fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
+            stream = new StringBuilder("BT\n");
+            stream.append("/F1 12 Tf\n");
+            stream.append((int) (page_width - 2 * figure_frame) / 4).append(" 760 Td\n");
+            stream.append("14 TL\n");
+            stream.append(Instructor.getString("disclaimer", Constants.VERSION)).append("\n");
+            stream.append("ET\n");
+            appendObjStreamPDF(fajl, (int) Math.ceil((double) cellak_szama / 6) + 4, stream.toString());
+            str.writeBytes(fajl.toString());
             bajtszam += fajl.length();
-            fajl = "";
+            fajl = new StringBuilder();
 
             //Ez már élesben megy
             origami1.reset();
-            Double maxdim = origami1.circumscribedSquareSize();
+            double maxdim = origami1.circumscribedSquareSize();
             if (maxdim == .0) {
                 maxdim = 1.;
             }
@@ -577,220 +373,61 @@ public class Export {
             //Ábrák
             for (int i = 0; i <= origami1.getHistory().size(); i++) {
 
-                int x = 0, y = 0;
-                String kep;
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
 
-                if (ForgatasIndexek.contains(i)) {
+                    String kep;
 
-                    switch ((objindex - (int) Math.ceil((double) cellak_szama / 6)) % 6) {
+                    int position = (objindex - (int) Math.ceil((double) cellak_szama / 6) - 3) % 6;
+                    int x = page_width / 4 * (2*(position%2)+1);
+                    int y = (page_height / 3 - figure_frame) / 4 + page_height / 6 * (5 - 2*(position/2));
 
-                        case 0:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
+                    if (ForgatasIndexek.contains(i)) {
+                        kamera.adjust(origami1);
+                        kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
+                        kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
+                    } else {
+                        setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
+                        kamera.adjust(origami1);
+                        kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
 
-                        case 1:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
+                        double[] sikpont;
+                        double[] siknv;
 
-                        case 2:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
+                        switch (origami1.getHistory().get(i).foldID) {
 
-                        case 3:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
+                            case Origami.FoldingAction.FOLD_REFLECTION:
+                            case Origami.FoldingAction.FOLD_ROTATION:
+                            case Origami.FoldingAction.FOLD_CREASE:
+                            case Origami.FoldingAction.FOLD_MUTILATION:
+                                sikpont = origami1.getHistory().get(i).ppoint;
+                                siknv = origami1.getHistory().get(i).pnormal;
+                                kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
+                                break;
 
-                        case 4:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
+                            case Origami.FoldingAction.FOLD_REFLECTION_P:
+                            case Origami.FoldingAction.FOLD_ROTATION_P:
+                            case Origami.FoldingAction.FOLD_MUTILATION_P:
+                                sikpont = origami1.getHistory().get(i).ppoint;
+                                siknv = origami1.getHistory().get(i).pnormal;
+                                kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
+                                break;
 
-                        case 5:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    kamera.adjust(origami1);
-                    kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
-                    kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
-
-                    Offszetek.add(bajtszam);
-                    stream = "q";
-                    stream += " ";
-                    stream += kep;
-                    stream += "Q";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
-                    fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
-                    objindex++;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
-                    bajtszam += fajl.length();
-                    fajl = "";
-                }
-
-                if (!UresIndexek.contains(i) && i < origami1.getHistory().size()) {
-
-                    double[] regiVaszonNV = kamera.getCamDirection();
-
-                    kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
-                            new double[]{0, 1, 0}));
-
-                    if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
-                        kamera.setCamDirection(new double[]{0, 0, 1});
-                    }
-
-                    kamera.setCamDirection(new double[]{kamera.getCamDirection()[0] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[1] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[2] / Geometry.vectorLength(kamera.getCamDirection())});
-
-                    kamera.setYAxis(new double[]{0, 1, 0});
-                    kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
-
-                    kamera.setXAxis(new double[]{kamera.getXAxis()[0] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[1] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[2] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom()});
-
-                    kamera.setYAxis(new double[]{kamera.getYAxis()[0] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[1] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[2] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom()});
-
-                    if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ForgatasIndexek.contains(i)) {
-
-                        kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
-                        kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
-                    }
-
-                    switch ((objindex - (int) Math.ceil((double) cellak_szama / 6)) % 6) {
-
-                        case 0:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 1:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 2:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 1 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 3:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 4:
-                            x = page_width / 4 * 3;
-                            y = page_height / 6 * 5 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        case 5:
-                            x = page_width / 4 * 1;
-                            y = page_height / 6 * 3 + (page_height / 3 - figure_frame) / 4;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    double[] sikpont;
-                    double[] siknv;
-
-                    kamera.adjust(origami1);
-                    kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
-
-                    switch (origami1.getHistory().get(i).foldID) {
-
-                        case Origami.FoldingAction.FOLD_REFLECTION:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_ROTATION:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_REFLECTION_P:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_ROTATION_P:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_CREASE:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_MUTILATION:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        case Origami.FoldingAction.FOLD_MUTILATION_P:
-                            sikpont = origami1.getHistory().get(i).ppoint;
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            kep = kamera.drawSelection(x, y, sikpont, siknv, (int) origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            break;
-
-                        default:
-                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
-                            break;
+                            default:
+                                kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
+                                break;
+                        }
                     }
 
                     Offszetek.add(bajtszam);
-                    stream = "q";
-                    stream += " ";
-                    stream += kep;
-                    stream += "Q";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
-                    fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
+                    stream = new StringBuilder("q");
+                    stream.append(" ");
+                    stream.append(kep);
+                    stream.append("Q\n");
+                    appendObjStreamPDF(fajl, objindex, stream.toString());
                     objindex++;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
+                    str.writeBytes(fajl.toString());
                     bajtszam += fajl.length();
-                    fajl = "";
+                    fajl = new StringBuilder();
                 }
                 origami1.execute(i, 1);
                 if (i < origami1.getHistory().size()) {
@@ -812,93 +449,33 @@ public class Export {
             }
 
             int dif = OrigamiGen1.difficultyLevel(origami1.difficulty());
-            String difname = null;
-            switch (dif) {
-                case 0:
-                    difname = Instructor.getString("level0");
-                    break;
-                case 1:
-                    difname = Instructor.getString("level1");
-                    break;
-                case 2:
-                    difname = Instructor.getString("level2");
-                    break;
-                case 3:
-                    difname = Instructor.getString("level3");
-                    break;
-                case 4:
-                    difname = Instructor.getString("level4");
-                    break;
-                case 5:
-                    difname = Instructor.getString("level5");
-                    break;
-                case 6:
-                    difname = Instructor.getString("level6");
-                    break;
-            }
+            String difname = Instructor.getString("level" + dif);
             Offszetek.add(bajtszam);
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 12 Tf";
-            stream += (char) 10;
-            stream += Integer.toString((int) (page_width - 2 * figure_frame) / 4) + " "
-                    + Integer.toString(722 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
-                            + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14)
-                    + " Td";
-            stream += (char) 10;
-            stream += "12 TL";
-            stream += (char) 10;
-            stream += Instructor.getString("difficulty", dif, difname);
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString(objindex) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
-            fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            stream = new StringBuilder("BT\n");
+            stream.append("/F1 12 Tf\n");
+            stream.append((int) (page_width - 2 * figure_frame) / 4).append(" ").append(722 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
+                    + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14).append(" Td\n");
+            stream.append("12 TL\n");
+            stream.append(Instructor.getString("difficulty", dif, difname)).append("\n");
+            stream.append("ET\n");
+            appendObjStreamPDF(fajl, objindex, stream.toString());
             objindex++;
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
+            str.writeBytes(fajl.toString());
             bajtszam += fajl.length();
-            fajl = "";
+            fajl = new StringBuilder();
 
             Offszetek.add(bajtszam);
-            stream = "BT";
-            stream += (char) 10;
-            stream += "/F1 12 Tf";
-            stream += (char) 10;
-            stream += Integer.toString((int) (page_width - 2 * figure_frame) / 4) + " "
-                    + Integer.toString(736 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
-                            + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14)
-                    + " Td";
-            stream += (char) 10;
-            stream += Instructor.getString("steps", cellak_szama - 2) + "Tj";
-            stream += (char) 10;
-            stream += "ET";
-            stream += (char) 10;
-            fajl += Integer.toString(objindex) + " 0 obj";
-            fajl += (char) 10;
-            fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-            fajl += (char) 10;
-            fajl += "stream";
-            fajl += (char) 10;
-            fajl += stream;
-            fajl += "endstream";
-            fajl += (char) 10;
-            fajl += "endobj";
-            fajl += (char) 10;
-            fajl += (char) 10;
+            stream = new StringBuilder("BT\n");
+            stream.append("/F1 12 Tf\n");
+            stream.append((int) (page_width - 2 * figure_frame) / 4).append(" ").append(736 - Instructor.getString("disclaimer", Constants.VERSION).length() * 14
+                    + Instructor.getString("disclaimer", Constants.VERSION).replace(") '", ") ").length() * 14).append(" Td\n");
+            stream.append(Instructor.getString("steps", cellak_szama - 2)).append("Tj\n");
+            stream.append("ET\n");
+            appendObjStreamPDF(fajl, objindex, stream.toString());
             objindex++;
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
+            str.writeBytes(fajl.toString());
             bajtszam += fajl.length();
-            fajl = "";
+            fajl = new StringBuilder();
 
             int sorszam = 1;
 
@@ -908,498 +485,207 @@ public class Export {
                 String utasitas = "";
                 String koo = "";
 
-                double[] siknv;
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
 
-                if (ForgatasIndexek.contains(i)) {
+                    if (ForgatasIndexek.contains(i)) {
 
-                    if (i == origami1.getHistory().size()) {
+                        if (i == origami1.getHistory().size()) {
 
-                        utasitas = Instructor.getString("outro", sorszam);
-                        sorszam++;
+                            utasitas = Instructor.getString("outro", sorszam);
+                            sorszam++;
+                        } else {
+
+                            utasitas = Instructor.getString("turn", sorszam, ForgatasSzogek.get(ForgatasIndexek.indexOf(i)));
+                            sorszam++;
+                        }
                     } else {
 
-                        utasitas = Instructor.getString("turn", sorszam, ForgatasSzogek.get(ForgatasIndexek.indexOf(i)));
-                        sorszam++;
-                    }
+                        setCameraDirection(kamera, origami1, i, ForgatasIndexek.contains(i));
 
-                    switch ((sorszam + 1) % 6) {
+                        String direction = null;
 
-                        case 1:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 2:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 3:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 4:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 5:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 0:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        default:
-                            break;
-                    }
-
-                    Offszetek.add(bajtszam);
-                    stream = "BT";
-                    stream += (char) 10;
-                    stream += "/F1 10 Tf";
-                    stream += (char) 10;
-                    stream += koo + " Td";
-                    stream += (char) 10;
-                    stream += "12 TL";
-                    stream += (char) 10;
-                    stream += utasitas;
-                    stream += (char) 10;
-                    stream += "ET";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex + sorszam - 2) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
-                    fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
-                    bajtszam += fajl.length();
-                    fajl = "";
-                }
-
-                if (!UresIndexek.contains(i) && i < origami1.getHistory().size()) {
-
-                    double[] regiVaszonNV = kamera.getCamDirection();
-
-                    kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
-                            new double[]{0, 1, 0}));
-
-                    if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
-                        kamera.setCamDirection(new double[]{0, 0, 1});
-                    }
-
-                    kamera.setCamDirection(new double[]{kamera.getCamDirection()[0] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[1] / Geometry.vectorLength(kamera.getCamDirection()),
-                        kamera.getCamDirection()[2] / Geometry.vectorLength(kamera.getCamDirection())});
-
-                    kamera.setYAxis(new double[]{0, 1, 0});
-                    kamera.setXAxis(Geometry.crossProduct(kamera.getCamDirection(), kamera.getYAxis()));
-
-                    kamera.setXAxis(new double[]{kamera.getXAxis()[0] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[1] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom(),
-                        kamera.getXAxis()[2] / Geometry.vectorLength(kamera.getXAxis()) * kamera.getZoom()});
-
-                    kamera.setYAxis(new double[]{kamera.getYAxis()[0] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[1] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom(),
-                        kamera.getYAxis()[2] / Geometry.vectorLength(kamera.getYAxis()) * kamera.getZoom()});
-
-                    if (Geometry.scalarProduct(regiVaszonNV, kamera.getCamDirection()) < 0 && !ForgatasIndexek.contains(i)) {
-
-                        kamera.setCamDirection(Geometry.vectorDiff(Geometry.nullvector, kamera.getCamDirection()));
-                        kamera.setXAxis(Geometry.vectorDiff(Geometry.nullvector, kamera.getXAxis()));
-                    }
-
-                    switch (origami1.getHistory().get(i).foldID) {
-
-                        case Origami.FoldingAction.FOLD_REFLECTION:
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            switch (foldtypes.get(i)) {
-
-                                case 0:
-                                    utasitas = Instructor.getString("no_fold", sorszam);
-                                    break;
-
-                                case -1:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("fold_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("fold_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("fold_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("fold_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    break;
-
-                                case -2:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("fold/rev_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("fold/rev_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("fold/rev_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("fold/rev_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    break;
-
-                                case -3:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("rev_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("rev_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("rev_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("rev_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    break;
-
-                                case -4:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("fold/sink_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("fold/sink_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("fold/sink_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("fold/sink_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    break;
-
-                                case -5:
-                                    switch (kamera.pdfLinerDir(siknv)) {
-                                        case Camera.PDF_NORTH:
-                                            utasitas = Instructor.getString("rev/sink_north", sorszam);
-                                            break;
-                                        case Camera.PDF_EAST:
-                                            utasitas = Instructor.getString("rev/sink_east", sorszam);
-                                            break;
-                                        case Camera.PDF_SOUTH:
-                                            utasitas = Instructor.getString("rev/sink_south", sorszam);
-                                            break;
-                                        case Camera.PDF_WEST:
-                                            utasitas = Instructor.getString("rev/sink_west", sorszam);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    break;
-
-                                default:
-                                    utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
-                                    break;
-                            }
-
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_ROTATION:
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            int szog = 0;
-                            int j = i - 1;
-                            while (UresIndexek.contains(j)) {
-
-                                if (origami1.getHistory().get(j).foldID == Origami.FoldingAction.FOLD_ROTATION) {
-
-                                    szog += origami1.getHistory().get(j).phi;
-                                }
-                                j--;
-                            }
-                            switch (kamera.pdfLinerDir(siknv)) {
-
-                                case Camera.PDF_NORTH:
-                                    utasitas = Instructor.getString("rotate_north", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                case Camera.PDF_EAST:
-                                    utasitas = Instructor.getString("rotate_east", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                case Camera.PDF_SOUTH:
-                                    utasitas = Instructor.getString("rotate_south", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                case Camera.PDF_WEST:
-                                    utasitas = Instructor.getString("rotate_west", sorszam, szog + origami1.getHistory().get(i).phi);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_REFLECTION_P:
-                            switch (foldtypes.get(i)) {
-
-                                case 0:
-                                    utasitas = Instructor.getString("no_fold", sorszam);
-                                    break;
-                                case -1:
-                                    utasitas = Instructor.getString("fold_gray", sorszam);
-                                    break;
-                                case -2:
-                                    utasitas = Instructor.getString("fold/rev_gray", sorszam);
-                                    break;
-                                case -3:
-                                    utasitas = Instructor.getString("rev_gray", sorszam);
-                                    break;
-                                case -4:
-                                    utasitas = Instructor.getString("fold/sink_gray", sorszam);
-                                    break;
-                                case -5:
-                                    utasitas = Instructor.getString("rev/sink_gray", sorszam);
-                                    break;
-                            }
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_ROTATION_P:
-                            int szog1 = 0;
-                            int j1 = i - 1;
-                            while (UresIndexek.contains(j1)) {
-
-                                if (origami1.getHistory().get(j1).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
-
-                                    szog1 += origami1.getHistory().get(j1).phi;
-                                }
-                                j1--;
-                            }
-                            utasitas = Instructor.getString("rotate_gray", sorszam, szog1 + origami1.getHistory().get(i).phi);
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_CREASE:
-                            utasitas = Instructor.getString("crease", sorszam, sorszam + 1);
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_MUTILATION:
-                            siknv = origami1.getHistory().get(i).pnormal;
-                            switch (kamera.pdfLinerDir(siknv)) {
-
-                                case Camera.PDF_NORTH:
-                                    utasitas = Instructor.getString("cut_north", sorszam);
-                                    break;
-                                case Camera.PDF_EAST:
-                                    utasitas = Instructor.getString("cut_east", sorszam);
-                                    break;
-                                case Camera.PDF_SOUTH:
-                                    utasitas = Instructor.getString("cut_south", sorszam);
-                                    break;
-                                case Camera.PDF_WEST:
-                                    utasitas = Instructor.getString("cut_west", sorszam);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            if (firstblood) {
-                                utasitas += Instructor.getString("cut_notice");
-                                firstblood = false;
-                            }
-                            sorszam++;
-                            break;
-
-                        case Origami.FoldingAction.FOLD_MUTILATION_P:
-                            utasitas = Instructor.getString("cut_gray", sorszam);
-                            if (firstblood) {
-                                utasitas += Instructor.getString("cut_notice");
-                                firstblood = false;
-                            }
-                            sorszam++;
-                            break;
-
-                        default:
-                            utasitas = "(" + sorszam + ". ???) ' ";
-                            sorszam++;
-                            break;
-                    }
-
-                    if (i == 0) {
-
-                        switch (origami1.getPaperType()) {
-
-                            case A4:
-                                utasitas = Instructor.getString("intro_a4", sorszam) + utasitas;
+                        switch (origami1.getHistory().get(i).foldID) {
+                            case Origami.FoldingAction.FOLD_REFLECTION:
+                            case Origami.FoldingAction.FOLD_ROTATION:
+                            case Origami.FoldingAction.FOLD_MUTILATION:
+                                double[] siknv = origami1.getHistory().get(i).pnormal;
+                                direction = kamera.pdfLinerDir(siknv).toString();
                                 break;
-                            case Square:
-                                utasitas = Instructor.getString("intro_square", sorszam) + utasitas;
-                                break;
-                            case Hexagon:
-                                utasitas = Instructor.getString("intro_hex", sorszam) + utasitas;
-                                break;
-                            case Dollar:
-                                utasitas = Instructor.getString("intro_dollar", sorszam) + utasitas;
-                                break;
-                            case Custom:
-                                if (origami1.getCorners().size() == 3) {
-                                    utasitas = Instructor.getString("intro_triangle", sorszam) + utasitas;
-                                } else if (origami1.getCorners().size() == 4) {
-                                    utasitas = Instructor.getString("intro_quad", sorszam) + utasitas;
-                                } else {
-                                    utasitas = Instructor.getString("intro_poly", sorszam) + utasitas;
-                                }
+                            case Origami.FoldingAction.FOLD_REFLECTION_P:
+                            case Origami.FoldingAction.FOLD_ROTATION_P:
+                            case Origami.FoldingAction.FOLD_MUTILATION_P:
+                                direction = "gray";
                                 break;
                             default:
                                 break;
                         }
+
+                        switch (origami1.getHistory().get(i).foldID) {
+
+                            case Origami.FoldingAction.FOLD_REFLECTION:
+                            case Origami.FoldingAction.FOLD_REFLECTION_P:
+                                switch (foldtypes.get(i)) {
+
+                                    case 0:
+                                        utasitas = Instructor.getString("no_fold", sorszam);
+                                        break;
+
+                                    case -1:
+                                        utasitas = Instructor.getString("fold_" + direction, sorszam);
+                                        break;
+
+                                    case -2:
+                                        utasitas = Instructor.getString("fold/rev_" + direction, sorszam);
+                                        break;
+
+                                    case -3:
+                                        utasitas = Instructor.getString("rev_" + direction, sorszam);
+                                        break;
+
+                                    case -4:
+                                        utasitas = Instructor.getString("fold/sink_" + direction, sorszam);
+                                        break;
+
+                                    case -5:
+                                        utasitas = Instructor.getString("rev/sink_" + direction, sorszam);
+                                        break;
+
+                                    default:
+                                        if (!direction.equals("gray"))
+                                            utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
+                                        break;
+                                }
+
+                                sorszam++;
+                                break;
+
+                            case Origami.FoldingAction.FOLD_ROTATION:
+                            case Origami.FoldingAction.FOLD_ROTATION_P:
+                                int szog = 0;
+                                int j = i - 1;
+                                while (UresIndexek.contains(j)) {
+
+                                    if (origami1.getHistory().get(j).foldID == origami1.getHistory().get(i).foldID) {
+
+                                        szog += origami1.getHistory().get(j).phi;
+                                    }
+                                    j--;
+                                }
+
+                                utasitas = Instructor.getString("rotate_" + direction, sorszam, szog + origami1.getHistory().get(i).phi);
+                                sorszam++;
+                                break;
+
+                            case Origami.FoldingAction.FOLD_CREASE:
+                                utasitas = Instructor.getString("crease", sorszam, sorszam + 1);
+                                sorszam++;
+                                break;
+
+                            case Origami.FoldingAction.FOLD_MUTILATION:
+                            case Origami.FoldingAction.FOLD_MUTILATION_P:
+                                utasitas = Instructor.getString("cut_" + direction, sorszam);
+                                if (firstblood) {
+                                    utasitas += Instructor.getString("cut_notice");
+                                    firstblood = false;
+                                }
+                                sorszam++;
+                                break;
+
+                            default:
+                                utasitas = "(" + sorszam + ". ???) ' ";
+                                sorszam++;
+                                break;
+                        }
+
+                        if (i == 0) {
+
+                            switch (origami1.getPaperType()) {
+
+                                case A4:
+                                    utasitas = Instructor.getString("intro_a4", sorszam) + utasitas;
+                                    break;
+                                case Square:
+                                    utasitas = Instructor.getString("intro_square", sorszam) + utasitas;
+                                    break;
+                                case Hexagon:
+                                    utasitas = Instructor.getString("intro_hex", sorszam) + utasitas;
+                                    break;
+                                case Dollar:
+                                    utasitas = Instructor.getString("intro_dollar", sorszam) + utasitas;
+                                    break;
+                                case Custom:
+                                    if (origami1.getCorners().size() == 3) {
+                                        utasitas = Instructor.getString("intro_triangle", sorszam) + utasitas;
+                                    } else if (origami1.getCorners().size() == 4) {
+                                        utasitas = Instructor.getString("intro_quad", sorszam) + utasitas;
+                                    } else {
+                                        utasitas = Instructor.getString("intro_poly", sorszam) + utasitas;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
 
-                    switch ((sorszam + 1) % 6) {
-
-                        case 1:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 2:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 2 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 3:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 4:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 1 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 5:
-                            koo = Integer.toString(page_width / 2 * 0 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        case 0:
-                            koo = Integer.toString(page_width / 2 * 1 + (page_width / 2 - figure_frame) / 3);
-                            koo += " ";
-                            koo += Integer.toString(page_height / 3 * 0 + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
-                            break;
-                        default:
-                            break;
-                    }
+                    int position = sorszam % 6;
+                    koo = (page_width / 2 * (position % 2) + (page_width / 2 - figure_frame) / 3) + " ";
+                    koo += Integer.toString(page_height / 3 * (2-position/2) + (page_height / 3 - figure_frame) / 2 + (page_height / 3 - figure_frame) / 4);
 
                     Offszetek.add(bajtszam);
-                    stream = "BT";
-                    stream += (char) 10;
-                    stream += "/F1 10 Tf";
-                    stream += (char) 10;
-                    stream += koo + " Td";
-                    stream += (char) 10;
-                    stream += "12 TL";
-                    stream += (char) 10;
-                    stream += utasitas;
-                    stream += (char) 10;
-                    stream += "ET";
-                    stream += (char) 10;
-                    fajl += Integer.toString(objindex + sorszam - 2) + " 0 obj";
-                    fajl += (char) 10;
-                    fajl += "<< /Length " + Integer.toString(stream.length()) + " >>";
-                    fajl += (char) 10;
-                    fajl += "stream";
-                    fajl += (char) 10;
-                    fajl += stream;
-                    fajl += "endstream";
-                    fajl += (char) 10;
-                    fajl += "endobj";
-                    fajl += (char) 10;
-                    fajl += (char) 10;
-                    str.write(fajl.getBytes(Charset.forName("UTF-8")));
+                    stream = new StringBuilder("BT\n");
+                    stream.append("/F1 10 Tf\n");
+                    stream.append(koo).append(" Td\n");
+                    stream.append("12 TL\n");
+                    stream.append(utasitas).append("\n");
+                    stream.append("ET\n");
+                    appendObjStreamPDF(fajl, objindex + sorszam - 2, stream.toString());
+                    str.writeBytes(fajl.toString());
                     bajtszam += fajl.length();
-                    fajl = "";
+                    fajl = new StringBuilder();
                 }
             }
 
             int xroffszet = bajtszam;
 
-            fajl += "xref";
-            fajl += (char) 10;
-            fajl += "0 " + Integer.toString(Offszetek.size());
-            fajl += (char) 10;
-            fajl += "0000000000 65535 f ";
-            fajl += (char) 10;
+            fajl.append("xref\n");
+            fajl.append("0 ").append(Offszetek.size()).append("\n");
+            fajl.append("0000000000 65535 f \n");
 
             for (int i = 1; i < Offszetek.size(); i++) {
 
                 for (int ii = 0; ii < 10 - Integer.toString(Offszetek.get(i)).length(); ii++) {
-                    fajl += "0";
+                    fajl.append("0");
                 }
-                fajl += Integer.toString(Offszetek.get(i));
-                fajl += " 00000 n ";
-                fajl += (char) 10;
+                fajl.append(Offszetek.get(i));
+                fajl.append(" 00000 n \n");
             }
 
-            fajl += "trailer";
-            fajl += (char) 10;
-            fajl += "<< /Root 1 0 R";
-            fajl += (char) 10;
-            fajl += "/Size " + Integer.toString(Offszetek.size());
-            fajl += (char) 10;
-            fajl += ">>";
-            fajl += (char) 10;
-            fajl += "startxref";
-            fajl += (char) 10;
-            fajl += Integer.toString(xroffszet);
-            fajl += (char) 10;
-            fajl += "%%EOF";
+            fajl.append("trailer\n");
+            fajl.append("<< /Root 1 0 R\n");
+            fajl.append("/Size ").append(Offszetek.size()).append("\n");
+            fajl.append(">>\n");
+            fajl.append("startxref\n");
+            fajl.append(xroffszet).append("\n");
+            fajl.append("%%EOF");
 
-            str.write(fajl.getBytes(Charset.forName("UTF-8")));
-            System.out.println(str.getChannel().position() + " bytes written to " + filename);
-            str.close();
+            str.writeBytes(fajl.toString());
+            System.out.println(str.size() + " bytes written to " + filename);
 
         } catch (Exception exc) {
             throw OrigamiException.H005;
         }
     }
 
-    static public void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename) throws Exception {
+    static private void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename, boolean revolving) throws Exception {
 
-        try (FileOutputStream fos = new FileOutputStream(filename)) {
+        try (OutputStream os = Files.newOutputStream(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream fos = new DataOutputStream(os)) {
 
-            fos.write('G');
-            fos.write('I');
-            fos.write('F');
-            fos.write('8');
-            fos.write('9');
-            fos.write('a');
+            fos.write("GIF89a".getBytes());
 
             fos.write((byte) width);
             fos.write((byte) (width >>> 8));
@@ -1426,17 +712,7 @@ public class Export {
             fos.write(0x21);
             fos.write(0xFF);
             fos.write(0x0B);
-            fos.write('N');
-            fos.write('E');
-            fos.write('T');
-            fos.write('S');
-            fos.write('C');
-            fos.write('A');
-            fos.write('P');
-            fos.write('E');
-            fos.write('2');
-            fos.write('.');
-            fos.write('0');
+            fos.write("NETSCAPE2.0".getBytes());
             fos.write(0x03);
             fos.write(0x01);
             fos.write(0x00);
@@ -1452,21 +728,40 @@ public class Export {
             cam.setXAxis(refcam.getXAxis().clone());
             cam.setYAxis(refcam.getYAxis().clone());
             cam.setZoom(0.8 * Math.min(width, height) / origami1.circumscribedSquareSize());
-            int steps = origami1.getHistoryPointer();
-            origami1.undo(steps);
+
+            int steps;
             boolean last = false;
-            while (origami1.getHistoryPointer() < steps || (last = !last && origami1.getHistoryPointer() == steps)) {
+
+            if (!revolving) {
+                steps = origami1.getHistoryPointer();
+                origami1.undo(steps);
+            } else {
+                cam.adjust(origami1);
+                steps = 0;
+            }
+
+            while ((!revolving && (origami1.getHistoryPointer() < steps || (last = !last && origami1.getHistoryPointer() == steps))) ||
+                    (revolving && steps < 72)) {
 
                 gimg.clearRect(0, 0, width, height);
-                cam.adjust(origami1);
-                cam.drawFaces(gimg, color, origami1);
-                cam.drawEdges(gimg, java.awt.Color.black, origami1);
-                origami1.redo();
+
+                if (!revolving) {
+                    cam.adjust(origami1);
+                    cam.drawFaces(gimg, color, origami1);
+                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    origami1.redo();
+                } else {
+                    cam.drawGradient(gimg, color, origami1);
+                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    cam.rotate(10, 0);
+                    steps++;
+                }
+
                 fos.write(0x21);
                 fos.write(0xF9);
                 fos.write(0x04);
                 fos.write(0x04);
-                fos.write(0x64); //delay time
+                fos.write(!revolving ? 0x64 : 0x05); //delay time
                 fos.write(0x00);
                 fos.write(0x00);
                 fos.write(0x00);
@@ -1488,18 +783,12 @@ public class Export {
 
                     fos.write(width / 2 + 1);
                     fos.write(0x80);
-                    for (int x = 0; x < width / 2; x++) {
+                    for (int x = 0; x < width; x++) {
 
-                        int rgb = img.getRGB(x, y) & 0xFFFFFF;
-                        int b = rgb % 0x100;
-                        int g = (rgb >>> 8) % 0x100;
-                        int r = rgb >>> 16;
-
-                        fos.write((((r * 5) / 256) * 25 + ((g * 5) / 256) * 5 + (b * 5) / 256));
-                    }
-                    fos.write(width - width / 2 + 1);
-                    fos.write(0x80);
-                    for (int x = width / 2; x < width; x++) {
+                        if (x == width / 2) {
+                            fos.write(width - width / 2 + 1);
+                            fos.write(0x80);
+                        }
 
                         int rgb = img.getRGB(x, y) & 0xFFFFFF;
                         int b = rgb % 0x100;
@@ -1515,154 +804,28 @@ public class Export {
             }
 
             fos.write(0x3B);
-            System.out.println(fos.getChannel().position() + " bytes written to " + filename);
-            fos.close();
+            System.out.println(fos.size() + " bytes written to " + filename);
 
         } catch (IOException ex) {
             throw OrigamiException.H005;
         }
     }
 
+    static public void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename) throws Exception {
+        exportGIF(origami, refcam, color, width, height, filename, false);
+    }
+
     static public void exportRevolvingGIF(Origami origami, Camera refcam, int color, int width, int height, String filename) throws Exception {
-
-        try (FileOutputStream fos = new FileOutputStream(filename)) {
-
-            fos.write('G');
-            fos.write('I');
-            fos.write('F');
-            fos.write('8');
-            fos.write('9');
-            fos.write('a');
-
-            fos.write((byte) width);
-            fos.write((byte) (width >>> 8));
-            fos.write((byte) height);
-            fos.write((byte) (height >>> 8));
-            fos.write(0b10010110);
-            fos.write(0);
-            fos.write(0);
-
-            for (int r = 1; r <= 5; r++) {
-                for (int g = 1; g <= 5; g++) {
-                    for (int b = 1; b <= 5; b++) {
-
-                        fos.write(r * 51);
-                        fos.write(g * 51);
-                        fos.write(b * 51);
-                    }
-                }
-            }
-            for (int i = 0; i < 9; i++) {
-                fos.write(0);
-            }
-
-            fos.write(0x21);
-            fos.write(0xFF);
-            fos.write(0x0B);
-            fos.write('N');
-            fos.write('E');
-            fos.write('T');
-            fos.write('S');
-            fos.write('C');
-            fos.write('A');
-            fos.write('P');
-            fos.write('E');
-            fos.write('2');
-            fos.write('.');
-            fos.write('0');
-            fos.write(0x03);
-            fos.write(0x01);
-            fos.write(0x00);
-            fos.write(0x00);
-            fos.write(0x00);
-
-            BufferedImage img = new BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
-            Graphics2D gimg = img.createGraphics();
-            gimg.setBackground(java.awt.Color.WHITE);
-            Origami origami1 = origami.copy();
-            Camera cam = new Camera(width / 2, height / 2, 1);
-            cam.setCamDirection(refcam.getCamDirection().clone());
-            cam.setXAxis(refcam.getXAxis().clone());
-            cam.setYAxis(refcam.getYAxis().clone());
-            cam.setZoom(0.8 * Math.min(width, height) / origami1.circumscribedSquareSize());
-            cam.adjust(origami1);
-
-            for (int i = 0; i < 72; i++) {
-
-                gimg.clearRect(0, 0, width, height);
-                cam.drawGradient(gimg, color, origami1);
-                cam.drawEdges(gimg, java.awt.Color.black, origami1);
-                cam.rotate(10, 0);
-
-                fos.write(0x21);
-                fos.write(0xF9);
-                fos.write(0x04);
-                fos.write(0x04);
-                fos.write(0x05); //delay time
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write(0x00);
-
-                fos.write(0x2C);
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write(0x00);
-                fos.write((byte) width);
-                fos.write((byte) (width >>> 8));
-                fos.write((byte) height);
-                fos.write((byte) (height >>> 8));
-                fos.write(0x00);
-
-                fos.write(0x07);
-
-                for (int y = 0; y < height; y++) {
-
-                    fos.write(width / 2 + 1);
-                    fos.write(0x80);
-                    for (int x = 0; x < width / 2; x++) {
-
-                        int rgb = img.getRGB(x, y) & 0xFFFFFF;
-                        int b = rgb % 0x100;
-                        int g = (rgb >>> 8) % 0x100;
-                        int r = rgb >>> 16;
-
-                        fos.write((((r * 5) / 256) * 25 + ((g * 5) / 256) * 5 + (b * 5) / 256));
-                    }
-                    fos.write(width - width / 2 + 1);
-                    fos.write(0x80);
-                    for (int x = width / 2; x < width; x++) {
-
-                        int rgb = img.getRGB(x, y) & 0xFFFFFF;
-                        int b = rgb % 0x100;
-                        int g = (rgb >>> 8) % 0x100;
-                        int r = rgb >>> 16;
-
-                        fos.write((((r * 5) / 256) * 25 + ((g * 5) / 256) * 5 + (b * 5) / 256));
-                    }
-                }
-                fos.write(0x01);
-                fos.write(0x81);
-                fos.write(0);
-            }
-
-            fos.write(0x3B);
-            System.out.println(fos.getChannel().position() + " bytes written to " + filename);
-            fos.close();
-
-        } catch (IOException ex) {
-            throw OrigamiException.H005;
-        }
+        exportGIF(origami, refcam, color, width, height, filename, true);
     }
 
     static public void exportPNG(Origami origami, String filename) throws Exception {
 
-        try {
+        try (OutputStream png = Files.newOutputStream(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING)) {
 
-            File png = new File(filename);
-            if (png.exists()) {
-                png.delete();
-            }
             BufferedImage img = new BufferedImage((int) origami.paperWidth(), (int) origami.paperHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
             Graphics2D g = img.createGraphics();
             g.setBackground(java.awt.Color.WHITE);
@@ -1679,76 +842,44 @@ public class Export {
 
     static public void exportJAR(Origami origami, String filename, int[] rgb) throws Exception {
 
-        try {
+        Path finalJarPath = Paths.get(filename);
 
-            File finalJar = new File(filename);
-            if (finalJar.exists()) {
-                finalJar.delete();
-            }
+        try (OutputStream os = Files.newOutputStream(finalJarPath,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream dos = new DataOutputStream(os);
+             ZipOutputStream zos = new ZipOutputStream(dos)) {
+
             long ordinal = 1;
-            File tempJar;
-            while ((tempJar = new File(finalJar.getParentFile(), ordinal + ".jar")).exists()
-                    || tempJar.equals(finalJar)) {
-                ordinal++;
-            }
-            ordinal = 1;
-            File tempOri;
-            while ((tempOri = new File(finalJar.getParentFile(), ordinal + ".ori")).exists()
-                    || tempOri.equals(finalJar)) {
+            Path tempOriPath;
+            while (Files.exists(tempOriPath = finalJarPath.resolveSibling(ordinal + ".ori"))
+                    || tempOriPath.equals(finalJarPath)) {
                 ordinal++;
             }
 
-            InputStream is = new Export().getClass().getResourceAsStream("/res/OrigamiDisplay.jar");
-            OutputStream os = new FileOutputStream(tempJar);
+            OrigamiIO.write_gen2(origami, tempOriPath.toString(), rgb);
 
-            int nextbyte;
-            while ((nextbyte = is.read()) != -1) {
-                os.write(nextbyte);
-            }
+            ZipInputStream jar = new ZipInputStream(Export.class.getResourceAsStream("/res/OrigamiDisplay.jar"));
 
-            is.close();
-            os.close();
-
-            OrigamiIO.write_gen2(origami, tempOri.getPath(), rgb);
-
-            ZipFile jar = new ZipFile(tempJar);
-            FileOutputStream fos = new FileOutputStream(finalJar);
-            ZipOutputStream zos = new ZipOutputStream(fos);
             ZipEntry next;
 
-            Enumeration<? extends ZipEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-                if (!(next = entries.nextElement()).isDirectory()) {
-
+            while ((next = jar.getNextEntry()) != null) {
+                if (!next.isDirectory()) {
                     zos.putNextEntry(next);
-                    is = jar.getInputStream(next);
-
-                    while ((nextbyte = is.read()) != -1) {
-                        zos.write(nextbyte);
-                    }
+                    jar.transferTo(zos);
                     zos.closeEntry();
-                    is.close();
                 }
             }
 
             next = new ZipEntry("o");
             zos.putNextEntry(next);
-            is = new FileInputStream(tempOri);
-            while ((nextbyte = is.read()) != -1) {
-                zos.write(nextbyte);
-            }
-
+            Files.copy(tempOriPath, zos);
             zos.closeEntry();
 
-            System.out.println(fos.getChannel().position() + " bytes written to " + filename);
-            zos.close();
-            fos.close();
-            is.close();
-            jar.close();
-
+            System.out.println(dos.size() + " bytes written to " + filename);
             System.out.print("Cleaning up... ");
-            tempOri.delete();
-            tempJar.delete();
+            Files.delete(tempOriPath);
             System.out.println("done");
 
         } catch (Exception ex) {
