@@ -8,9 +8,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
@@ -48,10 +47,11 @@ public class Export {
 
     static public void exportCTM(Origami origami, String filename, BufferedImage texture) throws Exception {
 
-        try (DataOutputStream str = new DataOutputStream(Files.newOutputStream(Paths.get(filename),
+        try (OutputStream os = Files.newOutputStream(Paths.get(filename),
                 StandardOpenOption.WRITE,
                 StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING))) {
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream str = new DataOutputStream(os)) {
 
             Camera kamera = new Camera(0, 0, 1);
             kamera.adjust(origami);
@@ -190,10 +190,11 @@ public class Export {
 
     static public void exportPDF(Origami origami, String filename, String title) throws Exception {
 
-        try (DataOutputStream str = new DataOutputStream(Files.newOutputStream(Paths.get(filename),
+        try (OutputStream os = Files.newOutputStream(Paths.get(filename),
                 StandardOpenOption.WRITE,
                 StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING))) {
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream str = new DataOutputStream(os)) {
 
             Origami origami1 = origami.copy();
 
@@ -678,7 +679,11 @@ public class Export {
 
     static private void exportGIF(Origami origami, Camera refcam, int color, int width, int height, String filename, boolean revolving) throws Exception {
 
-        try (FileOutputStream fos = new FileOutputStream(filename)) {
+        try (OutputStream os = Files.newOutputStream(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream fos = new DataOutputStream(os)) {
 
             fos.write("GIF89a".getBytes());
 
@@ -799,7 +804,7 @@ public class Export {
             }
 
             fos.write(0x3B);
-            System.out.println(fos.getChannel().position() + " bytes written to " + filename);
+            System.out.println(fos.size() + " bytes written to " + filename);
 
         } catch (IOException ex) {
             throw OrigamiException.H005;
@@ -816,12 +821,11 @@ public class Export {
 
     static public void exportPNG(Origami origami, String filename) throws Exception {
 
-        try {
+        try (OutputStream png = Files.newOutputStream(Paths.get(filename),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING)) {
 
-            File png = new File(filename);
-            if (png.exists()) {
-                png.delete();
-            }
             BufferedImage img = new BufferedImage((int) origami.paperWidth(), (int) origami.paperHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
             Graphics2D g = img.createGraphics();
             g.setBackground(java.awt.Color.WHITE);
@@ -838,76 +842,44 @@ public class Export {
 
     static public void exportJAR(Origami origami, String filename, int[] rgb) throws Exception {
 
-        try {
+        Path finalJarPath = Paths.get(filename);
 
-            File finalJar = new File(filename);
-            if (finalJar.exists()) {
-                finalJar.delete();
-            }
+        try (OutputStream os = Files.newOutputStream(finalJarPath,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+             DataOutputStream dos = new DataOutputStream(os);
+             ZipOutputStream zos = new ZipOutputStream(dos)) {
+
             long ordinal = 1;
-            File tempJar;
-            while ((tempJar = new File(finalJar.getParentFile(), ordinal + ".jar")).exists()
-                    || tempJar.equals(finalJar)) {
-                ordinal++;
-            }
-            ordinal = 1;
-            File tempOri;
-            while ((tempOri = new File(finalJar.getParentFile(), ordinal + ".ori")).exists()
-                    || tempOri.equals(finalJar)) {
+            Path tempOriPath;
+            while (Files.exists(tempOriPath = finalJarPath.resolveSibling(ordinal + ".ori"))
+                    || tempOriPath.equals(finalJarPath)) {
                 ordinal++;
             }
 
-            InputStream is = Export.class.getResourceAsStream("/res/OrigamiDisplay.jar");
-            OutputStream os = new FileOutputStream(tempJar);
+            OrigamiIO.write_gen2(origami, tempOriPath.toString(), rgb);
 
-            int nextbyte;
-            while ((nextbyte = is.read()) != -1) {
-                os.write(nextbyte);
-            }
+            ZipInputStream jar = new ZipInputStream(Export.class.getResourceAsStream("/res/OrigamiDisplay.jar"));
 
-            is.close();
-            os.close();
-
-            OrigamiIO.write_gen2(origami, tempOri.getPath(), rgb);
-
-            ZipFile jar = new ZipFile(tempJar);
-            FileOutputStream fos = new FileOutputStream(finalJar);
-            ZipOutputStream zos = new ZipOutputStream(fos);
             ZipEntry next;
 
-            Enumeration<? extends ZipEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-                if (!(next = entries.nextElement()).isDirectory()) {
-
+            while ((next = jar.getNextEntry()) != null) {
+                if (!next.isDirectory()) {
                     zos.putNextEntry(next);
-                    is = jar.getInputStream(next);
-
-                    while ((nextbyte = is.read()) != -1) {
-                        zos.write(nextbyte);
-                    }
+                    jar.transferTo(zos);
                     zos.closeEntry();
-                    is.close();
                 }
             }
 
             next = new ZipEntry("o");
             zos.putNextEntry(next);
-            is = new FileInputStream(tempOri);
-            while ((nextbyte = is.read()) != -1) {
-                zos.write(nextbyte);
-            }
-
+            Files.copy(tempOriPath, zos);
             zos.closeEntry();
 
-            System.out.println(fos.getChannel().position() + " bytes written to " + filename);
-            zos.close();
-            fos.close();
-            is.close();
-            jar.close();
-
+            System.out.println(dos.size() + " bytes written to " + filename);
             System.out.print("Cleaning up... ");
-            tempOri.delete();
-            tempJar.delete();
+            Files.delete(tempOriPath);
             System.out.println("done");
 
         } catch (Exception ex) {
