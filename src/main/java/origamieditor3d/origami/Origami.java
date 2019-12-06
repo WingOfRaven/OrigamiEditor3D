@@ -340,6 +340,18 @@ public interface Origami {
 		public final double[] pnormal;
 		public final int polygonIndex;
 		public final int phi;
+
+		@Override
+		public double[] getPpoint() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public double[] getPnormal() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 	/**

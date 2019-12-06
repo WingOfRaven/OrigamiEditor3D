@@ -1,8 +1,17 @@
 package origamieditor3d.origami;
 
-public class CommandFoldReflection implements Command {
+public class CommandFoldReflection extends CommandFold {
 	
-	public void execute() {}
+	public CommandFoldReflection(double[] ppoint, double[] pnormal, OrigamiGen1 origami) {
+
+		this.ppoint = ppoint;
+		this.pnormal = pnormal;
+		this.origami = origami;
+
+	}
+	public void execute() {
+		origami.internalReflectionFold(ppoint, pnormal);
+	}
 	public void undo() {}
 
 }
