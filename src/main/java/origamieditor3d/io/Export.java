@@ -715,9 +715,9 @@ public class Export {
             fos.write(0x00);
             fos.write(0x00);
 
-            BufferedImage img = new BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             Graphics2D gimg = img.createGraphics();
-            gimg.setBackground(java.awt.Color.WHITE);
+            gimg.setBackground(Color.white);
             Origami origami1 = origami.copy();
             Camera cam = new Camera(width / 2, height / 2, 1);
             cam.setCamDirection(refcam.getCamDirection().clone());
@@ -744,11 +744,11 @@ public class Export {
                 if (!revolving) {
                     cam.adjust(origami1);
                     cam.drawFaces(gimg, color, origami1);
-                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    cam.drawEdges(gimg, Color.black, origami1);
                     origami1.redo();
                 } else {
                     cam.drawGradient(gimg, color, origami1);
-                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    cam.drawEdges(gimg, Color.black, origami1);
                     cam.rotate(10, 0);
                     steps++;
                 }
@@ -822,9 +822,9 @@ public class Export {
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING)) {
 
-            BufferedImage img = new BufferedImage((int) origami.paperWidth(), (int) origami.paperHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+            BufferedImage img = new BufferedImage((int) origami.paperWidth(), (int) origami.paperHeight(), BufferedImage.TYPE_INT_RGB);
             Graphics2D g = img.createGraphics();
-            g.setBackground(java.awt.Color.WHITE);
+            g.setBackground(Color.white);
             g.clearRect(0, 0, (int) origami.paperWidth(), (int) origami.paperHeight());
             new Camera((int) origami.paperWidth() / 2, (int) origami.paperHeight() / 2, 1).drawCreasePattern(g, Color.BLACK, origami);
 
