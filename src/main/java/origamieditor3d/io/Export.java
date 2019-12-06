@@ -653,11 +653,7 @@ public class Export {
             fajl.append("0000000000 65535 f \n");
 
             for (int i = 1; i < Offszetek.size(); i++) {
-
-                for (int ii = 0; ii < 10 - Integer.toString(Offszetek.get(i)).length(); ii++) {
-                    fajl.append("0");
-                }
-                fajl.append(Offszetek.get(i));
+                fajl.append(String.format("%010d", Offszetek.get(i)));
                 fajl.append(" 00000 n \n");
             }
 
@@ -719,9 +715,9 @@ public class Export {
             fos.write(0x00);
             fos.write(0x00);
 
-            BufferedImage img = new BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             Graphics2D gimg = img.createGraphics();
-            gimg.setBackground(java.awt.Color.WHITE);
+            gimg.setBackground(Color.white);
             Origami origami1 = origami.copy();
             Camera cam = new Camera(width / 2, height / 2, 1);
             cam.setCamDirection(refcam.getCamDirection().clone());
@@ -748,11 +744,11 @@ public class Export {
                 if (!revolving) {
                     cam.adjust(origami1);
                     cam.drawFaces(gimg, color, origami1);
-                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    cam.drawEdges(gimg, Color.black, origami1);
                     origami1.redo();
                 } else {
                     cam.drawGradient(gimg, color, origami1);
-                    cam.drawEdges(gimg, java.awt.Color.black, origami1);
+                    cam.drawEdges(gimg, Color.black, origami1);
                     cam.rotate(10, 0);
                     steps++;
                 }
@@ -826,9 +822,9 @@ public class Export {
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING)) {
 
-            BufferedImage img = new BufferedImage((int) origami.paperWidth(), (int) origami.paperHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+            BufferedImage img = new BufferedImage((int) origami.paperWidth(), (int) origami.paperHeight(), BufferedImage.TYPE_INT_RGB);
             Graphics2D g = img.createGraphics();
-            g.setBackground(java.awt.Color.WHITE);
+            g.setBackground(Color.white);
             g.clearRect(0, 0, (int) origami.paperWidth(), (int) origami.paperHeight());
             new Camera((int) origami.paperWidth() / 2, (int) origami.paperHeight() / 2, 1).drawCreasePattern(g, Color.BLACK, origami);
 
