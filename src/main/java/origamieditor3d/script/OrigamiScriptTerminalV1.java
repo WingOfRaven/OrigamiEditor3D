@@ -128,7 +128,7 @@ public class OrigamiScriptTerminalV1 implements OrigamiScriptTerminal {
 		paramReset();
 		history.clear();
 
-		TerminalOrigami.undo(TerminalOrigami.getHistory().size());
+		TerminalOrigami.undo(TerminalOrigami.getCommandsList().getSize());
 		TerminalCamera = new Camera(0, 0, 1);
 	}
 
@@ -818,7 +818,7 @@ public class OrigamiScriptTerminalV1 implements OrigamiScriptTerminal {
 
 	private void UNDO() throws Exception {
 
-		if (TerminalOrigami.getHistory().size() > 0) {
+		if (TerminalOrigami.getCommandsList().getSize() > 0) {
 			TerminalOrigami.undo();
 		}
 		else {

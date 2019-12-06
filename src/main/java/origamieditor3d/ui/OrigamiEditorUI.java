@@ -90,7 +90,7 @@ import origamieditor3d.ui.panel.PaperPanel;
 
 /**
  *
- * @author Attila Bágyoni (ba-sz-at@users.sourceforge.net)
+ * @author Attila BÃ¡gyoni (ba-sz-at@users.sourceforge.net)
  */
 public class OrigamiEditorUI extends JFrame {
 
@@ -222,7 +222,7 @@ public class OrigamiEditorUI extends JFrame {
 					}
 					foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 					changeListenerShutUp = true;
-					timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+					timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 					changeListenerShutUp = false;
 					timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 				}
@@ -288,7 +288,7 @@ public class OrigamiEditorUI extends JFrame {
 					}
 					foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 					changeListenerShutUp = true;
-					timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+					timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 					changeListenerShutUp = false;
 					timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 				}
@@ -1369,7 +1369,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_oPanel1MousePressed
 
 	//
-	// DRAG / HÚZÁS
+	// DRAG / HÃšZÃ�S
 	//
 	private void oPanel1MouseDragged(MouseEvent evt) {// GEN-FIRST:event_oPanel1MouseDragged
 
@@ -1386,7 +1386,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_oPanel1MouseDragged
 
 	//
-	// RESIZE / ÁTMÉRETEZÉS
+	// RESIZE / Ã�TMÃ‰RETEZÃ‰S
 	//
 	private void oPanel1ComponentResized(ComponentEvent evt) {// GEN-FIRST:event_oPanel1ComponentResized
 
@@ -1441,7 +1441,7 @@ public class OrigamiEditorUI extends JFrame {
 			}
 			foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 			changeListenerShutUp = true;
-			timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+			timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 			changeListenerShutUp = false;
 			timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 			saved = false;
@@ -1449,7 +1449,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_jTextField1KeyTyped
 
 	//
-	// RESIZE / ÁTMÉRETEZÉS
+	// RESIZE / Ã�TMÃ‰RETEZÃ‰S
 	//
 	private void pPanel1ComponentResized(ComponentEvent evt) {// GEN-FIRST:event_pPanel1ComponentResized
 
@@ -1459,7 +1459,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_pPanel1ComponentResized
 
 	//
-	// EDITING (2D) / SZERKESZTÉS (2D)
+	// EDITING (2D) / SZERKESZTÃ‰S (2D)
 	//
 	private void pPanel1MouseClicked(MouseEvent evt) {// GEN-FIRST:event_pPanel1MouseClicked
 
@@ -1584,13 +1584,13 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_pPanel1MouseClicked
 
 	//
-	// EDITING (3D) / SZERKESZTÉS (3D)
+	// EDITING (3D) / SZERKESZTÃ‰S (3D)
 	//
 	private void oPanel1MouseClicked(MouseEvent evt) {// GEN-FIRST:event_oPanel1MouseClicked
 
@@ -1729,7 +1729,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 		if (alignOn) {
@@ -1817,7 +1817,7 @@ public class OrigamiEditorUI extends JFrame {
 
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 		if (alignOn) {
@@ -1923,7 +1923,7 @@ public class OrigamiEditorUI extends JFrame {
 
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 		if (alignOn) {
@@ -1932,7 +1932,7 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// MOUSE MOVEMENT OVER 3D VIEW / EGÉRMOZGÁS A 3D NÉZET FELETT
+	// MOUSE MOVEMENT OVER 3D VIEW / EGÃ‰RMOZGÃ�S A 3D NÃ‰ZET FELETT
 	//
 	private void oPanel1MouseMoved(MouseEvent evt) {// GEN-FIRST:event_oPanel1MouseMoved
 
@@ -2059,7 +2059,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_export_topdfActionPerformed
 
 	//
-	// UNDO / VISSZAVONÁS
+	// UNDO / VISSZAVONÃ�S
 	//
 	private void ui_edit_undoActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_edit_undoActionPerformed
 
@@ -2084,13 +2084,13 @@ public class OrigamiEditorUI extends JFrame {
 		saved = false;
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_edit_undoActionPerformed
 
 	//
-	// SCROLL OVER 3D VIEW / GÖRGETÉS A 3D NÉZET FELETT
+	// SCROLL OVER 3D VIEW / GÃ–RGETÃ‰S A 3D NÃ‰ZET FELETT
 	//
 	private void oPanel1MouseWheelMoved(MouseWheelEvent evt) {// GEN-FIRST:event_oPanel1MouseWheelMoved
 
@@ -2109,7 +2109,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_oPanel1MouseWheelMoved
 
 	//
-	// SAVE AS / MENTÉS MÁSKÉNT
+	// SAVE AS / MENTÃ‰S MÃ�SKÃ‰NT
 	//
 	private void ui_file_saveasActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_saveasActionPerformed
 
@@ -2177,7 +2177,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_export_toopenctmActionPerformed
 
 	//
-	// OPEN / MEGNYITÁS
+	// OPEN / MEGNYITÃ�S
 	//
 	private void ui_file_openActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_openActionPerformed
 
@@ -2254,7 +2254,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_openActionPerformed
@@ -2264,7 +2264,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_planeActionPerformed
 
 	//
-	// REDO / MÉGIS
+	// REDO / MÃ‰GIS
 	//
 	private void ui_edit_redoActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_edit_redoActionPerformed
 
@@ -2289,13 +2289,13 @@ public class OrigamiEditorUI extends JFrame {
 		saved = false;
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_edit_redoActionPerformed
 
 	//
-	// NEW HEXAGONAL PAPER / ÚJ PAPÍR (HATSZÖG)
+	// NEW HEXAGONAL PAPER / ÃšJ PAPÃ�R (HATSZÃ–G)
 	//
 	private void ui_file_new_hexagonalActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_hexagonalActionPerformed
 
@@ -2331,13 +2331,13 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_hexagonalActionPerformed
 
 	//
-	// NEW SQUARE PAPER / ÚJ PAPÍR (NÉGYZET)
+	// NEW SQUARE PAPER / ÃšJ PAPÃ�R (NÃ‰GYZET)
 	//
 	private void ui_file_new_squareActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_squareActionPerformed
 
@@ -2373,13 +2373,13 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_squareActionPerformed
 
 	//
-	// NEW A4 PAPER / ÚJ PAPÍR (A4)
+	// NEW A4 PAPER / ÃšJ PAPÃ�R (A4)
 	//
 	private void ui_file_new_a4ActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_a4ActionPerformed
 
@@ -2415,13 +2415,13 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_a4ActionPerformed
 
 	//
-	// NEW USD PAPER / ÚJ PAPÍR (EGYDOLLÁROS)
+	// NEW USD PAPER / ÃšJ PAPÃ�R (EGYDOLLÃ�ROS)
 	//
 	private void ui_file_new_dollarActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_dollarActionPerformed
 
@@ -2457,13 +2457,13 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_dollarActionPerformed
 
 	//
-	// OPTIONS MENU / BEÁLLÍTÁSOK MENÜ
+	// OPTIONS MENU / BEÃ�LLÃ�TÃ�SOK MENÃœ
 	//
 	private void ui_view_optionsActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_optionsActionPerformed
 		ui_options.setVisible(true);
@@ -2474,7 +2474,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_angleActionPerformed
 
 	//
-	// PLAIN PAPER / SIMA PAPÍR
+	// PLAIN PAPER / SIMA PAPÃ�R
 	//
 	private void ui_view_paper_plainActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_plainActionPerformed
 
@@ -2487,20 +2487,20 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_paper_plainActionPerformed
 
 	//
-	// ZOOM ON SCROLL / GÖRGETÉSRE NAGYÍT
+	// ZOOM ON SCROLL / GÃ–RGETÃ‰SRE NAGYÃ�T
 	//
 	private void ui_view_zoomActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_zoomActionPerformed
 		zoomOnScroll = ui_view_zoom.isSelected();
 	}// GEN-LAST:event_ui_view_zoomActionPerformed
 
 	//
-	// ABOUT / NÉVJEGY
+	// ABOUT / NÃ‰VJEGY
 	//
 	private void ui_help_aboutActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_help_aboutActionPerformed
 
 		final JEditorPane html = new JEditorPane("text/html",
 				"<html><body>" + "Origami Editor 3D Version " + Constants.VERSION + " <br>"
-						+ "Copyright © 2014 Bágyoni-Szabó Attila (ba-sz-at@users.sourceforge.net) <br>" + "<br>"
+						+ "Copyright Â© 2014 BÃ¡gyoni-SzabÃ³ Attila (ba-sz-at@users.sourceforge.net) <br>" + "<br>"
 						+ "Origami Editor 3D is licensed under the GNU General Public License version 3. <br>"
 						+ "<a href=\"/res/LICENSE.txt\">Click here for more information.</a> <br>" + "<br>"
 						+ "Some of the origami models bundled with this program are copyrighted works. <br>"
@@ -2532,7 +2532,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_help_aboutActionPerformed
 
 	///
-	/// SAVE / MENTÉS
+	/// SAVE / MENTÃ‰S
 	///
 	private void ui_file_saveActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_saveActionPerformed
 
@@ -2596,7 +2596,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_saveActionPerformed
 
 	//
-	// BEST FIT / LEGJOBB ILLESZKEDÉS
+	// BEST FIT / LEGJOBB ILLESZKEDÃ‰S
 	//
 	private void ui_view_bestActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_bestActionPerformed
 
@@ -2618,7 +2618,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_bestActionPerformed
 
 	//
-	// NEUSIS MODE / NEUSZISZ MÓD
+	// NEUSIS MODE / NEUSZISZ MÃ“D
 	//
 	private void ui_edit_neusisActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_edit_neusisActionPerformed
 
@@ -2642,7 +2642,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_neusisActionPerformed
 
 	//
-	// PREVIEW / ELŐNÉZET
+	// PREVIEW / ELÅ�NÃ‰ZET
 	//
 	private void ui_view_showActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_showActionPerformed
 
@@ -2655,7 +2655,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_showActionPerformed
 
 	//
-	// ANTIALIASING / SIMA ÉLEK
+	// ANTIALIASING / SIMA Ã‰LEK
 	//
 	private void ui_view_useActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_showActionPerformed
 
@@ -2668,7 +2668,7 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// UV PAPER / UV PAPÍR
+	// UV PAPER / UV PAPÃ�R
 	//
 	private void ui_view_paper_imageActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_imageActionPerformed
 
@@ -2749,7 +2749,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_paper_imageActionPerformed
 
 	//
-	// EMPTY PAPER / ÜRES PAPÍR
+	// EMPTY PAPER / ÃœRES PAPÃ�R
 	//
 	private void ui_view_paper_noneActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_noneActionPerformed
 
@@ -2762,7 +2762,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_paper_noneActionPerformed
 
 	//
-	// TIMELINE / IDŐVONAL
+	// TIMELINE / IDÅ�VONAL
 	//
 	private void ui_view_timelineActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_timelineActionPerformed
 
@@ -2775,14 +2775,14 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_timelineActionPerformed
 
 	//
-	// TIMELINE SLIDER / IDŐVONAL CSÚSZKA
+	// TIMELINE SLIDER / IDÅ�VONAL CSÃšSZKA
 	//
 	private void timeSliderStateChanged(ChangeEvent evt) {
 
 		if (foldNumber == timeSlider.getValue() || changeListenerShutUp) {
 			return;
 		}
-		if (terminal1.TerminalOrigami.getHistory().size() < 100) {
+		if (terminal1.TerminalOrigami.getCommandsList().getSize() < 100) {
 			if (foldNumber < timeSlider.getValue()) {
 				terminal1.TerminalOrigami.redo(timeSlider.getValue() - foldNumber);
 			}
@@ -2811,7 +2811,7 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// USER GUIDE / FELHASZNÁLÓI KÉZIKÖNYV
+	// USER GUIDE / FELHASZNÃ�LÃ“I KÃ‰ZIKÃ–NYV
 	//
 	private void ui_help_userActionPerformed(ActionEvent evt) {
 
@@ -2856,14 +2856,14 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// SHOW TOOLTIPS / EGÉRFELIRATOK MUTATÁSA
+	// SHOW TOOLTIPS / EGÃ‰RFELIRATOK MUTATÃ�SA
 	//
 	private void ui_help_showActionPerformed(ActionEvent evt) {
 		ToolTipManager.sharedInstance().setEnabled(ui_help_show.isSelected());
 	}
 
 	//
-	// GRADIENT PAPER / ÁRNYALT PAPÍR
+	// GRADIENT PAPER / Ã�RNYALT PAPÃ�R
 	//
 	private void ui_view_paper_gradientActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_gradientActionPerformed
 
@@ -3080,7 +3080,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_selectActionPerformed
 
 	//
-	// PLANE THROUGH 3 POINTS / 3 PONTOS ILLESZTÉS
+	// PLANE THROUGH 3 POINTS / 3 PONTOS ILLESZTÃ‰S
 	//
 	private void ui_planeActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_planeActionPerformed
 
@@ -3106,7 +3106,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_planeActionPerformed
 
 	//
-	// ANGLE BISECTOR / SZÖGFELEZŐ
+	// ANGLE BISECTOR / SZÃ–GFELEZÅ�
 	//
 	private void ui_angleActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_angleActionPerformed
 
@@ -3220,7 +3220,7 @@ public class OrigamiEditorUI extends JFrame {
 		properties.getContentPane().add(new JLabel(" "), c);
 		c.gridy = 4;
 		properties.getContentPane()
-				.add(new JLabel(Integer.toString(terminal1.TerminalOrigami.getHistory().size())), c);
+				.add(new JLabel(Integer.toString(terminal1.TerminalOrigami.getCommandsList().getSize())), c);
 		c.gridy = 5;
 		properties.getContentPane().add(new JLabel(" "), c);
 		c.gridy = 6;

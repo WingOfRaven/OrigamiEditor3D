@@ -64,8 +64,9 @@ public interface Origami {
 	 *
 	 * @return As described above.
 	 */
-	List<FoldingAction> getHistory();
-
+	//List<FoldingActionCommand> getHistory();
+	CommandsList getCommandsList();
+	
 	int getHistoryPointer();
 
 	List<int[]> getHistoryStream();
@@ -281,7 +282,7 @@ public interface Origami {
 
 	Origami copy();
 	
-	public class FoldingAction {
+	public class FoldingActionCommand implements Command{
 
 		public static final int FOLD_REFLECTION = 1;
 		public static final int FOLD_ROTATION = 2;
@@ -290,17 +291,19 @@ public interface Origami {
 		public static final int FOLD_CREASE = 5;
 		public static final int FOLD_MUTILATION = 6;
 		public static final int FOLD_MUTILATION_P = 7;
+		public OrigamiGen1 origami = null;
 
-		public FoldingAction(int foldID, double[] ppoint, double[] pnormal, int polygonIndex, int phi) {
+		public FoldingActionCommand(int foldID, double[] ppoint, double[] pnormal, int polygonIndex, int phi, OrigamiGen1 origami) {
 
 			this.foldID = foldID;
 			this.ppoint = ppoint;
 			this.pnormal = pnormal;
 			this.polygonIndex = polygonIndex;
 			this.phi = phi;
+			this.origami = origami;
 		}
 
-		public final void execute(OrigamiGen1 origami) {
+		public final void execute() {
 
 			switch (foldID) {
 
@@ -326,6 +329,10 @@ public interface Origami {
 				origami.internalMutilation(ppoint, pnormal, polygonIndex);
 				break;
 			}
+		}
+		
+		public void undo() {
+			// TODO
 		}
 
 		public final int foldID;
