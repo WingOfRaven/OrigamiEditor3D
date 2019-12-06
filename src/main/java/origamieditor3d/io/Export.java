@@ -653,11 +653,7 @@ public class Export {
             fajl.append("0000000000 65535 f \n");
 
             for (int i = 1; i < Offszetek.size(); i++) {
-
-                for (int ii = 0; ii < 10 - Integer.toString(Offszetek.get(i)).length(); ii++) {
-                    fajl.append("0");
-                }
-                fajl.append(Offszetek.get(i));
+                fajl.append(String.format("%010d", Offszetek.get(i)));
                 fajl.append(" 00000 n \n");
             }
 
