@@ -1,8 +1,6 @@
 package origamieditor3d.origami;
 
 public abstract class CommandFold implements Command, Cloneable {
-	public abstract int getFoldID();
-
 	protected double [] ppoint;
 	protected double [] pnormal;
 	protected OrigamiGen1 origami;

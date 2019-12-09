@@ -12,11 +12,6 @@ public class CommandFoldCrease extends CommandFold {
 	}
 
 	@Override
-	public int getFoldID() {
-		return foldID;
-	}
-
-	@Override
 	public void execute() {
 		origami.internalRotationFold(ppoint, pnormal, 0);
 	}

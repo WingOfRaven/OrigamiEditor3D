@@ -10,11 +10,6 @@ public class CommandFoldReflection extends CommandFold {
 	}
 
 	@Override
-	public int getFoldID() {
-		return foldID;
-	}
-
-	@Override
 	public void execute() {
 		origami.internalReflectionFold(ppoint, pnormal);
 	}

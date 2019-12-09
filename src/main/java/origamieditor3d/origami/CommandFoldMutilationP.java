@@ -13,11 +13,6 @@ public class CommandFoldMutilationP extends CommandFold {
 	}
 
 	@Override
-	public int getFoldID() {
-		return foldID;
-	}
-
-	@Override
 	public void execute() {
 		origami.internalMutilation(ppoint, pnormal, polygonIndex);
 	}

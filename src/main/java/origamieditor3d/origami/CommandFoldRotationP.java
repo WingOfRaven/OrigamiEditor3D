@@ -15,11 +15,6 @@ public class CommandFoldRotationP extends CommandFold {
 	}
 
 	@Override
-	public int getFoldID() {
-		return foldID;
-	}
-
-	@Override
 	public void execute() {
 		origami.internalRotationFold(ppoint, pnormal, phi, polygonIndex);
 	}

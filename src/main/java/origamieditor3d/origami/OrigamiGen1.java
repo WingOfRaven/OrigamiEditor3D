@@ -1384,7 +1384,6 @@ public class OrigamiGen1 implements Origami {
 	public void execute() {
 
 		for (int i = 0; i < historyPointer; i++) {
-			System.out.println(" i :" + i + ", action : " + foldingActionList.get(i).getFoldID());
 			foldingActionList.execute(i);
 		}
 	}
