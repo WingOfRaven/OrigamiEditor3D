@@ -26,7 +26,7 @@ import origamieditor3d.resources.Instructor;
 /**
  * A collection of methods for exporting origami into various formats.
  *
- * @author Attila BÃ¡gyoni (ba-sz-at@users.sourceforge.net)
+ * @author Attila Bágyoni (ba-sz-at@users.sourceforge.net)
  * @since 2013-01-14
  */
 public class Export {
@@ -60,56 +60,56 @@ public class Export {
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //5. verziÃ³
+            //5. verzió
             uj_int = 0x00000005;
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //RAW tÃ¶mÃ¶rÃ­tÃ©s
+            //RAW tömörítés
             uj_int = 0x00574152;
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //Pontok szÃ¡ma
+            //Pontok száma
             uj_int = origami.getVerticesSize();
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //HÃ¡romszÃ¶gek szÃ¡ma
+            //Háromszögek száma
             uj_int = haromszogek_hossz;
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //UV tÃ©rkÃ©pek szÃ¡ma
+            //UV térképek száma
             uj_int = texture == null ? 0 : 1;
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //AttibrÃºtumtÃ©rkÃ©pek szÃ¡ma
+            //Attibrútumtérképek száma
             uj_int = 0x00000000;
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //CsÃºcsonkÃ©nti merÃ´legesek nincsenek
+            //Csúcsonkénti merôlegesek nincsenek
             uj_int = 0x00000000;
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //ReklÃ¡m
+            //Reklám
             uj_int = 0x00000020;
             bajtlista.add((byte) (uj_int));
             bajtlista.add((byte) (uj_int >>> 8));
@@ -171,7 +171,7 @@ public class Export {
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //HÃ¡romszÃ¶gek
+            //Háromszögek
             for (int i = 0; i < origami.getPolygonsSize(); i++) {
 
                 if (origami.isNonDegenerate(i)) {
@@ -206,7 +206,7 @@ public class Export {
             bajtlista.add((byte) (uj_int >>> 16));
             bajtlista.add((byte) (uj_int >>> 24));
 
-            //CsÃºcsok
+            //Csúcsok
             for (int i = 0; i < origami.getVerticesSize(); i++) {
 
                 uj_int = Float.floatToIntBits((float) origami.getVertices().get(i)[0] - (float) kamera.getCamPosition()[0]);
@@ -316,12 +316,12 @@ public class Export {
             }
             FileOutputStream str = new FileOutputStream(pdf);
 
-            //Itt tÃ¡roljuk az objektumok offszeteit
+            //Itt tároljuk az objektumok offszeteit
             ArrayList<Integer> Offszetek = new ArrayList<>();
             Offszetek.add(0);
             int bajtszam = 0;
 
-            //MegszÃ¡moljuk, hÃ¡ny mÃ»velet nem lesz kÃ¼lÃ¶n feltÃ¼ntetve
+            //Megszámoljuk, hány mûvelet nem lesz külön feltüntetve
             int ures_muveletek = 0;
             ArrayList<Integer> UresIndexek = new ArrayList<>();
 
@@ -358,19 +358,19 @@ public class Export {
             }
 
             int forgatasok = 1;
-            //Azok a lÃ©pÃ©sek, amikhez szemszÃ¶gvÃ¡ltÃ¡s kell
+            //Azok a lépések, amikhez szemszögváltás kell
             ArrayList<Integer> ForgatasIndexek = new ArrayList<>();
-            //A szemszÃ¶gvÃ¡ltÃ¡sok fÃ¼ggÃ´leges forgÃ¡sszÃ¶gei
+            //A szemszögváltások függôleges forgásszögei
             ArrayList<Integer> ForgatasSzogek = new ArrayList<>();
 
             ArrayList<Integer> foldtypes = new ArrayList<>();
             boolean firstblood = true;
 
-            //MÃ©retezÃ©s Ã©s elÃ´igazÃ­tÃ¡s
+            //Méretezés és elôigazítás
             Camera kamera = new Camera(0, 0, 0.5);
             kamera.nextOrthogonalView();
 
-            //FelmÃ©rjÃ¼k az olyan lÃ©pÃ©sek szÃ¡mÃ¡t, amikhez szemszÃ¶gvÃ¡ltÃ¡s kell.
+            //Felmérjük az olyan lépések számát, amikhez szemszögváltás kell.
             for (int i = 0; i < origami1.getCommandsList().getSize(); i++) {
 
                 double[] regiVaszonNV = kamera.getCamDirection();
@@ -396,16 +396,16 @@ public class Export {
             }
             ForgatasIndexek.add(origami1.getCommandsList().getSize());
 
-            //Egy oldalon 6 cella van (papÃ­rmÃ©rettÃ´l fÃ¼ggetlenÃ¼l)
+            //Egy oldalon 6 cella van (papírmérettôl függetlenül)
             int cellak_szama = origami1.getCommandsList().getSize() + forgatasok - ures_muveletek + 2;
 
-            //FejlÃ©c
+            //Fejléc
             String fajl = "";
             fajl += "%PDF-1.3";
             fajl += (char) 10;
             fajl += (char) 10;
 
-            //KatalÃ³gus
+            //Katalógus
             Offszetek.add(fajl.length());
             fajl += "1 0 obj";
             fajl += (char) 10;
@@ -419,7 +419,7 @@ public class Export {
             fajl += (char) 10;
             fajl += (char) 10;
 
-            //KÃ¶tet
+            //Kötet
             Offszetek.add(fajl.length());
             fajl += "2 0 obj";
             fajl += (char) 10;
@@ -428,7 +428,7 @@ public class Export {
             fajl += "/Kids [";
             fajl += "3 0 R";
 
-            //Az oldalak szÃ¡ma a cellÃ¡k szÃ¡mÃ¡nak hatoda felfelÃ© kerekÃ­tve
+            //Az oldalak száma a cellák számának hatoda felfelé kerekítve
             for (int i = 1; i < (int) Math.ceil((double) cellak_szama / 6); i++) {
 
                 fajl += " " + Integer.toString(i + 3) + " 0 R";
@@ -475,8 +475,8 @@ public class Export {
                 fajl += (char) 10;
                 fajl += "/Contents[";
 
-                //Egy oldalon Ã¡ltalÃ¡nosan 6 kÃ©p Ã©s 6 szÃ¶veg objektum van
-                //A fÃ¡jltest elsÃ´ felÃ©ben a kÃ©pek, a mÃ¡sodikban a szÃ¶vegek vannak
+                //Egy oldalon általánosan 6 kép és 6 szöveg objektum van
+                //A fájltest elsô felében a képek, a másodikban a szövegek vannak
                 for (int ii = (int) Math.ceil((double) cellak_szama / 6) + i * 6;
                         ii < (cellak_szama < (i + 1) * 6
                                 ? (int) Math.ceil((double) cellak_szama / 6) + cellak_szama
@@ -497,7 +497,7 @@ public class Export {
                 fajl += (char) 10;
             }
 
-            //A cÃ­m a megadott fÃ¡jlnÃ©v
+            //A cím a megadott fájlnév
             Offszetek.add(fajl.length());
             String stream;
             stream = "BT";
@@ -527,7 +527,7 @@ public class Export {
             fajl += (char) 10;
             fajl += (char) 10;
 
-            //A cÃ­m alatti kÃ©t Ã¼res cellÃ¡ban van helyÃ¼nk a reklÃ¡mozÃ¡sra
+            //A cím alatti két üres cellában van helyünk a reklámozásra
             Offszetek.add(fajl.length());
             stream = "BT";
             stream += (char) 10;
@@ -557,7 +557,7 @@ public class Export {
             bajtszam += fajl.length();
             fajl = "";
 
-            //Ez mÃ¡r Ã©lesben megy
+            //Ez már élesben megy
             origami1.reset();
             Double maxdim = origami1.circumscribedSquareSize();
             if (maxdim == .0) {
@@ -568,10 +568,10 @@ public class Export {
             kamera.nextOrthogonalView();
             kamera.unadjust(origami1);
 
-            //Az objektum indexe, ahol Ã©pp tartunk
+            //Az objektum indexe, ahol épp tartunk
             int objindex = (int) Math.ceil((double) cellak_szama / 6) + 5;
 
-            //Ã�brÃ¡k
+            //Ábrák
             for (int i = 0; i <= origami1.getCommandsList().getSize(); i++) {
 
                 int x = 0, y = 0;
@@ -716,14 +716,14 @@ public class Export {
 
                     kamera.adjust(origami1);
                     kamera.setZoom(figure_frame / Math.max(kamera.circumscribedSquareSize(origami1), 1.) * kamera.getZoom());
-                    
+
                     int foldId = origami1.getCommandsList().getAtIndex(i).foldId ;
                     if (foldId == CommandFoldReflection.foldId || foldId == CommandFoldRotation.foldId || foldId == CommandFoldCrease.foldId || foldId == CommandFoldMutilation.foldId) {
-                    	
+
                             sikpont = ( origami1.getCommandsList().getAtIndex(i)).getPpoint();
                             siknv = ( origami1.getCommandsList().getAtIndex(i)).getPnormal();
                             kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                            
+
                     }  else if (foldId == CommandFoldReflectionP.foldId || foldId == CommandFoldRotationP.foldId || foldId == CommandFoldMutilationP.foldId  ) {
 
                             sikpont = ( origami1.getCommandsList().getAtIndex(i)).getPpoint();
@@ -733,7 +733,7 @@ public class Export {
                     } else {
 
                     		kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
-                            
+
                     }
 
                     Offszetek.add(bajtszam);
@@ -869,7 +869,7 @@ public class Export {
 
             int sorszam = 1;
 
-            //SzÃ¶vegek
+            //Szövegek
             for (int i = 0; i <= origami1.getCommandsList().getSize(); i++) {
 
                 String utasitas = "";
@@ -1095,7 +1095,7 @@ public class Export {
                             }
 
                             sorszam++;
-                   
+
 
                     } else if (foldId == CommandFoldRotation.foldId) {
                             siknv = ( origami1.getCommandsList().getAtIndex(i)).getPnormal();
@@ -1127,7 +1127,7 @@ public class Export {
                                     break;
                             }
                             sorszam++;
-                            
+
                     } else if (foldId == CommandFoldReflectionP.foldId) {
                             switch (foldtypes.get(i)) {
 
@@ -1151,7 +1151,7 @@ public class Export {
                                     break;
                             }
                             sorszam++;
-                         
+
 
                     } else if (foldId == CommandFoldRotationP.foldId) {
                             int szog1 = 0;
@@ -1166,11 +1166,11 @@ public class Export {
                             }
                             utasitas = Instructor.getString("rotate_gray", sorszam, szog1 + ( origami1.getCommandsList().getAtIndex(i)).getPhi());
                             sorszam++;
-                           
+
                     } else if (foldId == CommandFoldCrease.foldId) {
                             utasitas = Instructor.getString("crease", sorszam, sorszam + 1);
                             sorszam++;
-                         
+
 
                     } else if (foldId == CommandFoldMutilation.foldId) {
                             siknv = ( origami1.getCommandsList().getAtIndex(i)).getPnormal();
@@ -1196,7 +1196,7 @@ public class Export {
                                 firstblood = false;
                             }
                             sorszam++;
-                           
+
 
                     } else if (foldId == CommandFoldMutilationP.foldId) {
                             utasitas = Instructor.getString("cut_gray", sorszam);
@@ -1205,7 +1205,7 @@ public class Export {
                                 firstblood = false;
                             }
                             sorszam++;
-                          
+
 
                     } else {
                             utasitas = "(" + sorszam + ". ???) ' ";

@@ -90,7 +90,7 @@ import origamieditor3d.ui.panel.PaperPanel;
 
 /**
  *
- * @author Attila BÃ¡gyoni (ba-sz-at@users.sourceforge.net)
+ * @author Attila Bágyoni (ba-sz-at@users.sourceforge.net)
  */
 public class OrigamiEditorUI extends JFrame {
 
@@ -1369,7 +1369,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_oPanel1MousePressed
 
 	//
-	// DRAG / HÃšZÃ�S
+	// DRAG / HÚZÁS
 	//
 	private void oPanel1MouseDragged(MouseEvent evt) {// GEN-FIRST:event_oPanel1MouseDragged
 
@@ -1386,7 +1386,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_oPanel1MouseDragged
 
 	//
-	// RESIZE / Ã�TMÃ‰RETEZÃ‰S
+	// RESIZE / ÁTMÉRETEZÉS
 	//
 	private void oPanel1ComponentResized(ComponentEvent evt) {// GEN-FIRST:event_oPanel1ComponentResized
 
@@ -1449,7 +1449,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_jTextField1KeyTyped
 
 	//
-	// RESIZE / Ã�TMÃ‰RETEZÃ‰S
+	// RESIZE / ÁTMÉRETEZÉS
 	//
 	private void pPanel1ComponentResized(ComponentEvent evt) {// GEN-FIRST:event_pPanel1ComponentResized
 
@@ -1459,7 +1459,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_pPanel1ComponentResized
 
 	//
-	// EDITING (2D) / SZERKESZTÃ‰S (2D)
+	// EDITING (2D) / SZERKESZTÉS (2D)
 	//
 	private void pPanel1MouseClicked(MouseEvent evt) {// GEN-FIRST:event_pPanel1MouseClicked
 
@@ -1590,7 +1590,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_pPanel1MouseClicked
 
 	//
-	// EDITING (3D) / SZERKESZTÃ‰S (3D)
+	// EDITING (3D) / SZERKESZTÉS (3D)
 	//
 	private void oPanel1MouseClicked(MouseEvent evt) {// GEN-FIRST:event_oPanel1MouseClicked
 
@@ -1932,7 +1932,7 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// MOUSE MOVEMENT OVER 3D VIEW / EGÃ‰RMOZGÃ�S A 3D NÃ‰ZET FELETT
+	// MOUSE MOVEMENT OVER 3D VIEW / EGÉRMOZGÁS A 3D NÉZET FELETT
 	//
 	private void oPanel1MouseMoved(MouseEvent evt) {// GEN-FIRST:event_oPanel1MouseMoved
 
@@ -2059,7 +2059,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_export_topdfActionPerformed
 
 	//
-	// UNDO / VISSZAVONÃ�S
+	// UNDO / VISSZAVONÁS
 	//
 	private void ui_edit_undoActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_edit_undoActionPerformed
 
@@ -2090,7 +2090,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_undoActionPerformed
 
 	//
-	// SCROLL OVER 3D VIEW / GÃ–RGETÃ‰S A 3D NÃ‰ZET FELETT
+	// SCROLL OVER 3D VIEW / GÖRGETÉS A 3D NÉZET FELETT
 	//
 	private void oPanel1MouseWheelMoved(MouseWheelEvent evt) {// GEN-FIRST:event_oPanel1MouseWheelMoved
 
@@ -2109,7 +2109,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_oPanel1MouseWheelMoved
 
 	//
-	// SAVE AS / MENTÃ‰S MÃ�SKÃ‰NT
+	// SAVE AS / MENTÉS MÁSKÉNT
 	//
 	private void ui_file_saveasActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_saveasActionPerformed
 
@@ -2177,7 +2177,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_export_toopenctmActionPerformed
 
 	//
-	// OPEN / MEGNYITÃ�S
+	// OPEN / MEGNYITÁS
 	//
 	private void ui_file_openActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_openActionPerformed
 
@@ -2264,7 +2264,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_planeActionPerformed
 
 	//
-	// REDO / MÃ‰GIS
+	// REDO / MÉGIS
 	//
 	private void ui_edit_redoActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_edit_redoActionPerformed
 
@@ -2295,7 +2295,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_redoActionPerformed
 
 	//
-	// NEW HEXAGONAL PAPER / ÃšJ PAPÃ�R (HATSZÃ–G)
+	// NEW HEXAGONAL PAPER / ÚJ PAPÍR (HATSZÖG)
 	//
 	private void ui_file_new_hexagonalActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_hexagonalActionPerformed
 
@@ -2337,7 +2337,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_new_hexagonalActionPerformed
 
 	//
-	// NEW SQUARE PAPER / ÃšJ PAPÃ�R (NÃ‰GYZET)
+	// NEW SQUARE PAPER / ÚJ PAPÍR (NÉGYZET)
 	//
 	private void ui_file_new_squareActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_squareActionPerformed
 
@@ -2379,7 +2379,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_new_squareActionPerformed
 
 	//
-	// NEW A4 PAPER / ÃšJ PAPÃ�R (A4)
+	// NEW A4 PAPER / ÚJ PAPÍR (A4)
 	//
 	private void ui_file_new_a4ActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_a4ActionPerformed
 
@@ -2421,7 +2421,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_new_a4ActionPerformed
 
 	//
-	// NEW USD PAPER / ÃšJ PAPÃ�R (EGYDOLLÃ�ROS)
+	// NEW USD PAPER / ÚJ PAPÍR (EGYDOLLÁROS)
 	//
 	private void ui_file_new_dollarActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_new_dollarActionPerformed
 
@@ -2463,7 +2463,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_new_dollarActionPerformed
 
 	//
-	// OPTIONS MENU / BEÃ�LLÃ�TÃ�SOK MENÃœ
+	// OPTIONS MENU / BEÁLLÍTÁSOK MENÜ
 	//
 	private void ui_view_optionsActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_optionsActionPerformed
 		ui_options.setVisible(true);
@@ -2474,7 +2474,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_angleActionPerformed
 
 	//
-	// PLAIN PAPER / SIMA PAPÃ�R
+	// PLAIN PAPER / SIMA PAPÍR
 	//
 	private void ui_view_paper_plainActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_plainActionPerformed
 
@@ -2487,20 +2487,20 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_paper_plainActionPerformed
 
 	//
-	// ZOOM ON SCROLL / GÃ–RGETÃ‰SRE NAGYÃ�T
+	// ZOOM ON SCROLL / GÖRGETÉSRE NAGYÍT
 	//
 	private void ui_view_zoomActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_zoomActionPerformed
 		zoomOnScroll = ui_view_zoom.isSelected();
 	}// GEN-LAST:event_ui_view_zoomActionPerformed
 
 	//
-	// ABOUT / NÃ‰VJEGY
+	// ABOUT / NÉVJEGY
 	//
 	private void ui_help_aboutActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_help_aboutActionPerformed
 
 		final JEditorPane html = new JEditorPane("text/html",
 				"<html><body>" + "Origami Editor 3D Version " + Constants.VERSION + " <br>"
-						+ "Copyright Â© 2014 BÃ¡gyoni-SzabÃ³ Attila (ba-sz-at@users.sourceforge.net) <br>" + "<br>"
+						+ "Copyright © 2014 Bágyoni-Szabó Attila (ba-sz-at@users.sourceforge.net) <br>" + "<br>"
 						+ "Origami Editor 3D is licensed under the GNU General Public License version 3. <br>"
 						+ "<a href=\"/res/LICENSE.txt\">Click here for more information.</a> <br>" + "<br>"
 						+ "Some of the origami models bundled with this program are copyrighted works. <br>"
@@ -2532,7 +2532,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_help_aboutActionPerformed
 
 	///
-	/// SAVE / MENTÃ‰S
+	/// SAVE / MENTÉS
 	///
 	private void ui_file_saveActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_file_saveActionPerformed
 
@@ -2596,7 +2596,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_file_saveActionPerformed
 
 	//
-	// BEST FIT / LEGJOBB ILLESZKEDÃ‰S
+	// BEST FIT / LEGJOBB ILLESZKEDÉS
 	//
 	private void ui_view_bestActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_bestActionPerformed
 
@@ -2618,7 +2618,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_bestActionPerformed
 
 	//
-	// NEUSIS MODE / NEUSZISZ MÃ“D
+	// NEUSIS MODE / NEUSZISZ MÓD
 	//
 	private void ui_edit_neusisActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_edit_neusisActionPerformed
 
@@ -2642,7 +2642,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_edit_neusisActionPerformed
 
 	//
-	// PREVIEW / ELÅ�NÃ‰ZET
+	// PREVIEW / ELŐNÉZET
 	//
 	private void ui_view_showActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_showActionPerformed
 
@@ -2655,7 +2655,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_showActionPerformed
 
 	//
-	// ANTIALIASING / SIMA Ã‰LEK
+	// ANTIALIASING / SIMA ÉLEK
 	//
 	private void ui_view_useActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_showActionPerformed
 
@@ -2668,7 +2668,7 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// UV PAPER / UV PAPÃ�R
+	// UV PAPER / UV PAPÍR
 	//
 	private void ui_view_paper_imageActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_imageActionPerformed
 
@@ -2749,7 +2749,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_paper_imageActionPerformed
 
 	//
-	// EMPTY PAPER / ÃœRES PAPÃ�R
+	// EMPTY PAPER / ÜRES PAPÍR
 	//
 	private void ui_view_paper_noneActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_noneActionPerformed
 
@@ -2762,7 +2762,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_paper_noneActionPerformed
 
 	//
-	// TIMELINE / IDÅ�VONAL
+	// TIMELINE / IDŐVONAL
 	//
 	private void ui_view_timelineActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_timelineActionPerformed
 
@@ -2775,7 +2775,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_view_timelineActionPerformed
 
 	//
-	// TIMELINE SLIDER / IDÅ�VONAL CSÃšSZKA
+	// TIMELINE SLIDER / IDŐVONAL CSÚSZKA
 	//
 	private void timeSliderStateChanged(ChangeEvent evt) {
 
@@ -2811,7 +2811,7 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// USER GUIDE / FELHASZNÃ�LÃ“I KÃ‰ZIKÃ–NYV
+	// USER GUIDE / FELHASZNÁLÓI KÉZIKÖNYV
 	//
 	private void ui_help_userActionPerformed(ActionEvent evt) {
 
@@ -2856,14 +2856,14 @@ public class OrigamiEditorUI extends JFrame {
 	}
 
 	//
-	// SHOW TOOLTIPS / EGÃ‰RFELIRATOK MUTATÃ�SA
+	// SHOW TOOLTIPS / EGÉRFELIRATOK MUTATÁSA
 	//
 	private void ui_help_showActionPerformed(ActionEvent evt) {
 		ToolTipManager.sharedInstance().setEnabled(ui_help_show.isSelected());
 	}
 
 	//
-	// GRADIENT PAPER / Ã�RNYALT PAPÃ�R
+	// GRADIENT PAPER / ÁRNYALT PAPÍR
 	//
 	private void ui_view_paper_gradientActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_view_paper_gradientActionPerformed
 
@@ -3080,7 +3080,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_selectActionPerformed
 
 	//
-	// PLANE THROUGH 3 POINTS / 3 PONTOS ILLESZTÃ‰S
+	// PLANE THROUGH 3 POINTS / 3 PONTOS ILLESZTÉS
 	//
 	private void ui_planeActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_planeActionPerformed
 
@@ -3106,7 +3106,7 @@ public class OrigamiEditorUI extends JFrame {
 	}// GEN-LAST:event_ui_planeActionPerformed
 
 	//
-	// ANGLE BISECTOR / SZÃ–GFELEZÅ�
+	// ANGLE BISECTOR / SZÖGFELEZŐ
 	//
 	private void ui_angleActionPerformed(ActionEvent evt) {// GEN-FIRST:event_ui_angleActionPerformed
 
