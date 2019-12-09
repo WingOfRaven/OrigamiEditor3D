@@ -64,8 +64,8 @@ public interface Origami {
 	 *
 	 * @return As described above.
 	 */
-	//List<FoldingActionCommand> getHistory();
 	CommandsList getCommandsList();
+	CommandsList getHistory();
 	
 	int getHistoryPointer();
 

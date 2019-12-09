@@ -1,11 +1,12 @@
 package origamieditor3d.origami;
 
 public class CommandFoldCrease extends CommandFold {
-	
-	int phi;
 	static {
-		foldId = 5;
+		foldID = 5;
 	}
+
+	protected int phi;
+
 	public CommandFoldCrease(double[] ppoint, double[] pnormal, OrigamiGen1 origami) {
 
 		this.ppoint = ppoint;
@@ -13,10 +14,12 @@ public class CommandFoldCrease extends CommandFold {
 		this.origami = origami;
 
 	}
-	
+
+	@Override
 	public void execute() {
 		origami.internalRotationFold(ppoint, pnormal, 0);
 	}
+
 	public void undo() {}
 	
 	@Override  

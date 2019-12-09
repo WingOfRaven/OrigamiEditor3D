@@ -1,8 +1,6 @@
 package origamieditor3d.origami;
 
 public interface Command {
-	
-
 	/**
 	 * Execute the command.
 	 */
@@ -12,9 +10,4 @@ public interface Command {
 	 * Execute the opposite command.
 	 */
 	void undo();
-	
-	double [] getPpoint();
-	double [] getPnormal();
-
-
 }

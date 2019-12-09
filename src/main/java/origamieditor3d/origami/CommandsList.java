@@ -83,7 +83,10 @@ public class CommandsList {
 		}
 	
 	}
-	
+
+	public int size() {
+		return commands.size();
+	}
 	public int getSize() {
 		return commands.size();
 	}
@@ -92,7 +95,7 @@ public class CommandsList {
 	public void executeAtIndex(int index) {
 		commands.get(index).execute();
 	}
-	public CommandFold getAtIndex(int index) {
+	public CommandFold get(int index) {
 		return commands.get(index);
 	}
 	public void clearPart (int start, int end) {

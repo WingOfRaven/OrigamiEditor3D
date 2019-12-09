@@ -1,12 +1,12 @@
 package origamieditor3d.origami;
 
 public class CommandFoldMutilationP extends CommandFold {
-	
-	int polygonIndex;
-	
 	static {
-		foldId = 7;
+		foldID = 7;
 	}
+
+	int polygonIndex;
+
 	public CommandFoldMutilationP(double[] ppoint, double[] pnormal, int polygonIndex, OrigamiGen1 origami) {
 
 		this.ppoint = ppoint;

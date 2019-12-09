@@ -1,13 +1,13 @@
 package origamieditor3d.origami;
 
 public class CommandFoldRotationP extends CommandFold {
+	static {
+		foldID = 2;
+	}
+
 	int phi;
 	int polygonIndex;
-	
-	static {
-		foldId = 4;
-	}
-	
+
 	public CommandFoldRotationP(double[] ppoint, double[] pnormal,  int polygonIndex, int phi, OrigamiGen1 origami) {
 
 		this.ppoint = ppoint;

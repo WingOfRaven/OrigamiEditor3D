@@ -1,18 +1,20 @@
 package origamieditor3d.origami;
 
 public abstract class CommandFold implements Command {
-	
-	double [] ppoint;
-	double [] pnormal;
-	public static int foldId = 0;
-	OrigamiGen1 origami;
-	
-	@Override
+	protected static int foldID;
+
+	public static int getFoldID() {
+		return foldID;
+	}
+
+	protected double [] ppoint;
+	protected double [] pnormal;
+	protected OrigamiGen1 origami;
+
 	public double[] getPpoint() {
 		return this.ppoint;
 	}
-	
-	@Override
+
 	public double[] getPnormal() {
 		return this.pnormal;
 	}

@@ -169,13 +169,19 @@ public class OrigamiIO {
     }
 
     static public Origami read_gen2(ByteArrayInputStream ori, int[] rgb) throws Exception {
+        return read(ori, rgb);
+    }
 
-        try {
-
-            Origami origami;
+    static public Origami read_gen1(ByteArrayInputStream ori) throws Exception {
+        return read(ori, null);
+    }
+    
+    static public Origami read(ByteArrayInputStream ori, int[] rgb) throws Exception {
+       
+        try (InputStream str = LZW.extract(ori)) {
+            Origami origami = null;
             ori.reset();
-            InputStream str = LZW.extract(ori);
-
+            
             //reading header
             int fejlec1 = str.read();
             fejlec1 <<= 8;
@@ -185,233 +191,124 @@ public class OrigamiIO {
             fejlec1 <<= 8;
             fejlec1 += str.read();
 
-            if (fejlec1 != 0x4f453344) { //OE3D
-
-                str.close();
+            if (fejlec1 != 0x4f453344) //OE3D
                 throw OrigamiException.H005;
-            } else {
 
-                int fejlec2 = str.read(); //version
-                fejlec2 <<= 8;
-                fejlec2 += str.read(); //number of payloads
+            int gen = -1;
+            int fejlec2 = str.read(); //version
+            fejlec2 <<= 8;
+            fejlec2 += str.read(); //number of payloads
 
-                if ((fejlec2 & 0xFF00) != 0x0300) { //ver 3
+            if ((fejlec2 & 0xFF00) == 0x0300) //ver 3
+                gen = 2;
+            else if (fejlec2 == 0x0263)
+                gen = 1;
+            else
+                throw OrigamiException.H005;
+            
+            //paper type
+            int papir = str.read();
 
-                    str.close();
-                    return read_gen1(ori);
-                } else {
+            if (PaperType.forChar((char) papir) != Origami.PaperType.Custom) {
 
-                    //paper type
-                    int papir = str.read();
-                    if (PaperType.forChar((char) papir) != Origami.PaperType.Custom) {
-
-                        origami = new OrigamiGen2(PaperType.forChar((char) papir));
-                        str.read();
-                    } else {
-
-                        ArrayList<double[]> sarkok = new ArrayList<>(Arrays.asList(new double[][]{}));
-                        int sarokszam = str.read();
-
-                        for (int i = 0; i < sarokszam; i++) {
-
-                            int Xint = str.read();
-                            Xint <<= 8;
-                            Xint += str.read();
-                            Xint <<= 8;
-                            Xint += str.read();
-                            Xint <<= 8;
-                            Xint += str.read();
-                            float X = Float.intBitsToFloat(Xint);
-
-                            int Yint = str.read();
-                            Yint <<= 8;
-                            Yint += str.read();
-                            Yint <<= 8;
-                            Yint += str.read();
-                            Yint <<= 8;
-                            Yint += str.read();
-                            float Y = Float.intBitsToFloat(Yint);
-
-                            sarkok.add(new double[]{(double) X, (double) Y});
-                        }
-
-                        origami = new OrigamiGen2(sarkok);
-                    }
+                if (gen == 1)
+                    origami = new OrigamiGen1(PaperType.forChar((char) papir));
+                else if (gen == 2)
+                    origami = new OrigamiGen2(PaperType.forChar((char) papir));
                     
-                    if ((fejlec2 & 0xFF) != 0x63) {
-                        for (int i=0; i<(fejlec2 & 0xFF); i++) {
-                            
-                            int payload_id = str.read();
-                            if (payload_id == 0x43) { //paper color
-                                if (rgb != null) {
-                                    
-                                    rgb[0] = str.read();
-                                    rgb[1] = str.read();
-                                    rgb[2] = str.read();
-                                }
-                                else {
-                                    
-                                    str.read();
-                                    str.read();
-                                    str.read();
-                                }
-                            }
-                        }
-                    }
-
-                    //command blocks
-                    int[] block = new int[16];
-                    int i=-1;
-
-                    block[++i] = str.read();
-                    block[++i] = str.read();
-                    block[++i] = str.read();
-                    block[++i] = str.read();
-                    int header = (((((block[0] << 8) + block[1]) << 8) + block[2]) << 8) + block[3];
-                    while (header != 0x0A454f46) {
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-
-                        origami.addCommand(block.clone());
-                        i = -1;
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        header = (((((block[0] << 8) + block[1]) << 8) + block[2]) << 8) + block[3];
-                    }
-                    origami.redoAll();
-                    str.close();
-                    return origami;
-                }
-            }
-        } catch (Exception ex) {
-            throw OrigamiException.H005;
-        }
-    }
-
-    static public Origami read_gen1(ByteArrayInputStream ori) throws Exception {
-
-        try {
-
-            Origami origami;
-            ori.reset();
-            InputStream str = LZW.extract(ori);
-
-            int fejlec1 = str.read();
-            fejlec1 <<= 8;
-            fejlec1 += str.read();
-            fejlec1 <<= 8;
-            fejlec1 += str.read();
-            fejlec1 <<= 8;
-            fejlec1 += str.read();
-
-            if (fejlec1 != 0x4f453344) {
-
-                str.close();
-                throw OrigamiException.H005;
+                str.read();
             } else {
 
-                int fejlec2 = str.read();
-                fejlec2 <<= 8;
-                fejlec2 += str.read();
+                ArrayList<double[]> sarkok = new ArrayList<>(Arrays.asList(new double[][]{}));
+                int sarokszam = str.read();
 
-                if (fejlec2 != 0x0263) {
+                for (int i = 0; i < sarokszam; i++) {
 
-                    str.close();
-                    throw OrigamiException.H005;
-                } else {
+                    int Xint = str.read();
+                    Xint <<= 8;
+                    Xint += str.read();
+                    Xint <<= 8;
+                    Xint += str.read();
+                    Xint <<= 8;
+                    Xint += str.read();
+                    float X = Float.intBitsToFloat(Xint);
 
-                    int papir = str.read();
+                    int Yint = str.read();
+                    Yint <<= 8;
+                    Yint += str.read();
+                    Yint <<= 8;
+                    Yint += str.read();
+                    Yint <<= 8;
+                    Yint += str.read();
+                    float Y = Float.intBitsToFloat(Yint);
 
-                    if (PaperType.forChar((char) papir) != Origami.PaperType.Custom) {
+                    sarkok.add(new double[]{(double) X, (double) Y});
+                }
 
-                        origami = new OrigamiGen1(PaperType.forChar((char) papir));
-                        str.read();
-                    } else {
-
-                        ArrayList<double[]> sarkok = new ArrayList<>(Arrays.asList(new double[][]{}));
-                        int sarokszam = str.read();
-
-                        for (int i = 0; i < sarokszam; i++) {
-
-                            int Xint = str.read();
-                            Xint <<= 8;
-                            Xint += str.read();
-                            Xint <<= 8;
-                            Xint += str.read();
-                            Xint <<= 8;
-                            Xint += str.read();
-                            float X = Float.intBitsToFloat(Xint);
-
-                            int Yint = str.read();
-                            Yint <<= 8;
-                            Yint += str.read();
-                            Yint <<= 8;
-                            Yint += str.read();
-                            Yint <<= 8;
-                            Yint += str.read();
-                            float Y = Float.intBitsToFloat(Yint);
-
-                            sarkok.add(new double[]{(double) X, (double) Y});
+                if (gen == 1)
+                    origami = new OrigamiGen1(sarkok);
+                else if (gen == 2)
+                    origami = new OrigamiGen2(sarkok);
+            }
+            
+            if (gen == 2 && (fejlec2 & 0xFF) != 0x63) {
+                for (int i=0; i<(fejlec2 & 0xFF); i++) {
+                    
+                    int payload_id = str.read();
+                    if (payload_id == 0x43) { //paper color
+                        if (rgb != null) {
+                            
+                            rgb[0] = str.read();
+                            rgb[1] = str.read();
+                            rgb[2] = str.read();
                         }
-
-                        origami = new OrigamiGen1(sarkok);
+                        else {
+                            
+                            str.read();
+                            str.read();
+                            str.read();
+                        }
                     }
-
-                    int[] block = new int[16];
-                    int i=-1;
-
-                    block[++i] = str.read();
-                    block[++i] = str.read();
-                    block[++i] = str.read();
-                    block[++i] = str.read();
-                    int header = (((((block[0] << 8) + block[1]) << 8) + block[2]) << 8) + block[3];
-                    while (header != 0x0A454f46) {
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-
-                        origami.addCommand(block.clone());
-                        i = -1;
-
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        block[++i] = str.read();
-                        header = (((((block[0] << 8) + block[1]) << 8) + block[2]) << 8) + block[3];
-                    }
-                    origami.redoAll();
-                    str.close();
-                    return origami;
                 }
             }
+
+            //command blocks
+            int[] block = new int[16];
+            int i=-1;
+
+            block[++i] = str.read();
+            block[++i] = str.read();
+            block[++i] = str.read();
+            block[++i] = str.read();
+            int header = (((((block[0] << 8) + block[1]) << 8) + block[2]) << 8) + block[3];
+            while (header != 0x0A454f46) {
+
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+
+                origami.addCommand(block.clone());
+                i = -1;
+
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+                block[++i] = str.read();
+                header = (((((block[0] << 8) + block[1]) << 8) + block[2]) << 8) + block[3];
+            }
+            origami.redoAll();
+            return origami;
         } catch (Exception ex) {
             throw OrigamiException.H005;
         }
