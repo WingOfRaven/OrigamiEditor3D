@@ -11,9 +11,12 @@ public class CommandFoldReflection extends CommandFold {
 		this.origami = origami;
 	}
 
+	@Override
 	public void execute() {
 		origami.internalReflectionFold(ppoint, pnormal);
 	}
+
+	@Override
 	public void undo() {}
 }
 

@@ -15,16 +15,17 @@ public class CommandFoldMutilationP extends CommandFold {
 		this.origami = origami;
 
 	}
-	
+
+	@Override
 	public void execute() {
 		origami.internalMutilation(ppoint, pnormal, polygonIndex);
 	}
+
+	@Override
 	public void undo() {}
 	
 	@Override
 	public int getPolygonIndex() {
 		return this.polygonIndex;
-		
 	}
-
 }

@@ -11,10 +11,13 @@ public class CommandFoldMutilation extends CommandFold {
 		this.pnormal = pnormal;
 		this.origami = origami;
 	}
-	
+
+	@Override
 	public void execute() {
 		origami.internalMutilation(ppoint, pnormal);
 	}
+
+	@Override
 	public void undo() {}
 }
 

@@ -20,13 +20,12 @@ public class CommandFoldCrease extends CommandFold {
 		origami.internalRotationFold(ppoint, pnormal, 0);
 	}
 
+	@Override
 	public void undo() {}
 	
 	@Override  
 	public int getPhi() {
 		return this.phi;
 	}
-
-
 }
 

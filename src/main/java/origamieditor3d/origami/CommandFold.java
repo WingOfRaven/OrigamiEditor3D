@@ -26,5 +26,4 @@ public abstract class CommandFold implements Command {
 	public int getPhi() {
 		return 0;
 	}
-
 }

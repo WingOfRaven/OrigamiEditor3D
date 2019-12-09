@@ -17,11 +17,14 @@ public class CommandFoldRotationP extends CommandFold {
 		this.origami = origami;
 
 	}
+
+	@Override
 	public void execute() {
 		origami.internalRotationFold(ppoint, pnormal, phi, polygonIndex);
 	}
+
+	@Override
 	public void undo() {}
-	
 
 	@Override
 	public int getPhi() {
