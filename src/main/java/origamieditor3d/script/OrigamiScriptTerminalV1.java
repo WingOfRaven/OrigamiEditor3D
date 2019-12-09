@@ -161,244 +161,57 @@ public class OrigamiScriptTerminalV1 implements OrigamiScriptTerminal {
 	private interface Command {
 		void execute(String... args) throws Exception;
 	}
+	
+	private interface CommandV2 {
+		void execute() throws Exception;
+	}
 
-	final private HashMap<String, Command> Commands = new HashMap<>();
+	final private HashMap<String, CommandV2> Commands = new HashMap<>();
 	final private HashMap<String, Command> Params = new HashMap<>();
-
+	
 	{
-		Params.put("plane", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				plane(args);
-			}
-		});
-
-		Params.put("planethrough", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				planethrough(args);
-			}
-		});
-
-		Params.put("angle-bisector", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				angle_bisector(args);
-			}
-		});
-
-		Params.put("planepoint", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				planepoint(args);
-			}
-		});
-
-		Params.put("planenormal", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				planenormal(args);
-			}
-		});
-
-		Params.put("target", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				target(args);
-			}
-		});
-
-		Params.put("angle", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				angle(args);
-			}
-		});
-
-		Params.put("paper", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				paper(args);
-			}
-		});
-
-		Params.put("corner", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				corner(args);
-			}
-		});
-
-		Params.put("locale", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				locale(args);
-			}
-		});
-
-		Params.put("filename", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				filename(args);
-			}
-		});
-
-		Params.put("title", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				title(args);
-			}
-		});
-
-		Params.put("camera", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				camera(args);
-			}
-		});
-
-		Params.put("color", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				color(args);
-			}
-		});
-
-		Params.put("uncolor", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				uncolor(args);
-			}
-		});
+		Params.put("plane", this::plane);
+		Params.put("planethrough", this::planethrough);
+		Params.put("angle-bisector", this::angle_bisector);
+		Params.put("planepoint", this::planepoint);
+		Params.put("planenormal", this::planenormal);
+		Params.put("target", this::target);
+		Params.put("angle", this::angle);
+		Params.put("paper", this::paper);
+		Params.put("corner", this::corner);
+		Params.put("locale", this::locale);
+		Params.put("filename", this::filename);
+		Params.put("title", this::title);
+		Params.put("camera", this::camera);
+		Params.put("color", this::color);
+		Params.put("uncolor", this::uncolor);
+			
 	}
 
 	{
-		Commands.put("new", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				NEW();
-			}
-		});
-
-		Commands.put("rotate", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				ROTATE();
-			}
-		});
-
-		Commands.put("reflect", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				REFLECT();
-			}
-		});
-
-		Commands.put("cut", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				CUT();
-			}
-		});
-
-		Commands.put("undo", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				UNDO();
-			}
-		});
-
-		Commands.put("redo", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				REDO();
-			}
-		});
-
-		Commands.put("diagnostics", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				DIAGNOSTICS();
-			}
-		});
-
-		Commands.put("load", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				LOAD();
-			}
-		});
-
-		Commands.put("open", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				OPEN();
-			}
-		});
-
-		Commands.put("load-texture", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				LOAD_TEXTURE();
-			}
-		});
-
-		Commands.put("unload-texture", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				UNLOAD_TEXTURE();
-			}
-		});
-
-		Commands.put("export-ctm", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				EXPORT_CTM();
-			}
-		});
-
-		Commands.put("export-autopdf", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				EXPORT_AUTOPDF();
-			}
-		});
-
-		Commands.put("export-gif", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				EXPORT_GIF();
-			}
-		});
-
-		Commands.put("export-jar", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				EXPORT_JAR();
-			}
-		});
-
-		Commands.put("export-png", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				EXPORT_PNG();
-			}
-		});
-
-		Commands.put("export-revolving-gif", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				EXPORT_REVOLVING_GIF();
-			}
-		});
-
-		Commands.put("export-ori", new Command() {
-			@Override
-			public void execute(String... args) throws Exception {
-				EXPORT_ORI();
-			}
-		});
+		
+		Commands.put("new", this::NEW);
+		Commands.put("rotate", this::ROTATE);
+		Commands.put("reflect", this::REFLECT);
+		Commands.put("cut", this::CUT);
+		Commands.put("undo", this::UNDO);
+		Commands.put("redo", this::REDO);
+		Commands.put("diagnostics", this::DIAGNOSTICS);
+		Commands.put("load", this::LOAD);
+		Commands.put("open", this::OPEN);
+		Commands.put("load-texture", this::LOAD_TEXTURE);
+		Commands.put("unload-texture", this::UNLOAD_TEXTURE);
+		Commands.put("export-ctm", this::EXPORT_CTM);
+		Commands.put("export-autopdf", this::EXPORT_AUTOPDF);
+		Commands.put("export-gif", this::EXPORT_GIF);
+		Commands.put("export-jar", this::EXPORT_JAR);
+		Commands.put("export-png", this::EXPORT_PNG);
+		Commands.put("export-revolving-gif", this::EXPORT_REVOLVING_GIF);
+		Commands.put("export-ori", this::EXPORT_ORI);
+	
 	}
+
+	
 
 	/*
 	 * EDITOR PARAMETERS
