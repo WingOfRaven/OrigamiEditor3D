@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class CommandsList {
 
 	/** The commands. */
-	private LinkedList<Command> commands;
+	private LinkedList<CommandFold> commands;
 	
 	/** The index. */
 	private int index;
@@ -19,7 +19,7 @@ public class CommandsList {
 	 */
 	public CommandsList() {
 
-		commands = new LinkedList<Command>();
+		commands = new LinkedList<CommandFold>();
 		index = -1;
 	}
 	
@@ -29,7 +29,7 @@ public class CommandsList {
 	 *
 	 * @param command the command to add
 	 */
-	public void addCommand(Command command, boolean execute) {
+	public void addCommand(CommandFold command, boolean execute) {
 		int i = index+1;
 		while(i<commands.size()) {
 			commands.remove(i);
@@ -92,7 +92,7 @@ public class CommandsList {
 	public void executeAtIndex(int index) {
 		commands.get(index).execute();
 	}
-	public Command getAtIndex(int index) {
+	public CommandFold getAtIndex(int index) {
 		return commands.get(index);
 	}
 	public void clearPart (int start, int end) {

@@ -282,7 +282,7 @@ public interface Origami {
 
 	Origami copy();
 	
-	public class FoldingActionCommand implements Command{
+	/*public class FoldingActionCommand implements Command{
 
 		public static final int FOLD_REFLECTION = 1;
 		public static final int FOLD_ROTATION = 2;
@@ -352,7 +352,7 @@ public interface Origami {
 			// TODO Auto-generated method stub
 			return null;
 		}
-	}
+	}*/
 
 	/**
 	 * Enumerates the preset paper types of the {@link OrigamiGen1} class.

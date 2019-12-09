@@ -4,6 +4,7 @@ public abstract class CommandFold implements Command {
 	
 	double [] ppoint;
 	double [] pnormal;
+	public static int foldId = 0;
 	OrigamiGen1 origami;
 	
 	@Override
@@ -16,5 +17,12 @@ public abstract class CommandFold implements Command {
 		return this.pnormal;
 	}
 	
+	public int getPolygonIndex() {
+		return 0;
+	}
+	
+	public int getPhi() {
+		return 0;
+	}
 
 }

@@ -1,5 +1,6 @@
 package origamieditor3d.origami;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,6 @@ public class OrigamiGen1 implements Origami {
 		verticesSize = 0;
 		polygons = new ArrayList<>();
 		polygonsSize = 0;
-		//history = new ArrayList<>();
 		foldingActionList = new CommandsList();
 		historyStream = new ArrayList<>();
 		historyPointer = 0;
@@ -55,7 +55,6 @@ public class OrigamiGen1 implements Origami {
 		verticesSize = 0;
 		polygons = new ArrayList<>();
 		polygonsSize = 0;
-		//history = new ArrayList<>();
 		foldingActionList = new CommandsList();
 		historyStream = new ArrayList<>();
 		historyPointer = 0;
@@ -335,59 +334,59 @@ public class OrigamiGen1 implements Origami {
 			pnormal = new double[] { -pnormal[0], -pnormal[1], -pnormal[2] };
 		}
 
-		FoldingActionCommand comnd;
+		CommandFold comnd;
 		if ((header >>> 24) % 8 == 1) {
 
 			// reflection fold
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_REFLECTION, ppoint, pnormal, 0, 0, this);
+			comnd = new CommandFoldReflection(ppoint, pnormal, this);
 		}
 		else if ((header >>> 24) % 8 == 2) {
 
 			// positive rot. fold
 			int phi = (header >>> 16) % 256;
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_ROTATION, ppoint, pnormal, 0, phi, this);
+			comnd = new CommandFoldRotation(ppoint, pnormal, phi, this);
 		}
 		else if ((header >>> 24) % 8 == 3) {
 
 			// negative rot. fold
 			int phi = -(header >>> 16) % 256;
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_ROTATION, ppoint, pnormal, 0, phi, this);
+			comnd = new CommandFoldRotation(ppoint, pnormal, phi, this);
 		}
 		else if ((header >>> 24) % 8 == 4) {
 
 			// partial reflection fold
 			int polygonIndex = (header % 65536);
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_REFLECTION_P, ppoint, pnormal, polygonIndex, 0, this);
+			comnd = new CommandFoldReflectionP(ppoint, pnormal, polygonIndex, this);
 		}
 		else if ((header >>> 24) % 8 == 5) {
 
 			// positive partial rot. fold
 			int phi = (header >>> 16) % 256;
 			int polygonIndex = (header % 65536);
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_ROTATION_P, ppoint, pnormal, polygonIndex, phi, this);
+			comnd = new CommandFoldRotationP(ppoint, pnormal, polygonIndex, phi, this);
 		}
 		else if ((header >>> 24) % 8 == 6) {
 
 			// negative partial rot. fold
 			int phi = -(header >>> 16) % 256;
 			int polygonIndex = (header % 65536);
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_ROTATION_P, ppoint, pnormal, polygonIndex, phi, this);
+			comnd = new CommandFoldRotationP(ppoint, pnormal,  polygonIndex, phi, this);
 		}
 		else if ((header >>> 24) % 8 == 7) {
 
 			// crease
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_CREASE, ppoint, pnormal, 0, 0, this);
+			comnd = new CommandFoldCrease(ppoint, pnormal, this);
 		}
 		else if (header % 65536 == 65535) {
 
 			// cut
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_MUTILATION, ppoint, pnormal, 0, 0, this);
+			comnd = new CommandFoldMutilation(ppoint, pnormal, this);
 		}
 		else {
 
 			// partial cut
 			int polygonIndex = (header % 65536);
-			comnd = new FoldingActionCommand(FoldingActionCommand.FOLD_MUTILATION_P, ppoint, pnormal, polygonIndex, 0, this);
+			comnd = new CommandFoldMutilationP(ppoint, pnormal, polygonIndex, this);
 		}
 
 		foldingActionList.addCommand(comnd, false);
@@ -1160,7 +1159,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(FoldingActionCommand.FOLD_REFLECTION, ppoint, pnormal, 0, 0);
+		addCommand(CommandFoldReflection.foldId, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1173,7 +1172,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(FoldingActionCommand.FOLD_REFLECTION_P, ppoint, pnormal, polygonIndex, 0);
+		addCommand(CommandFoldReflectionP.foldId, ppoint, pnormal, polygonIndex, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1186,7 +1185,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(FoldingActionCommand.FOLD_ROTATION, ppoint, pnormal, 0, phi);
+		addCommand(CommandFoldRotation.foldId, ppoint, pnormal, 0, phi);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1199,7 +1198,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(FoldingActionCommand.FOLD_ROTATION_P, ppoint, pnormal, polygonIndex, phi);
+		addCommand(CommandFoldRotationP.foldId, ppoint, pnormal, polygonIndex, phi);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1212,7 +1211,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(FoldingActionCommand.FOLD_CREASE, ppoint, pnormal, 0, 0);
+		addCommand(CommandFoldCrease.foldId, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1225,7 +1224,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(FoldingActionCommand.FOLD_MUTILATION, ppoint, pnormal, 0, 0);
+		addCommand(CommandFoldMutilation.foldId, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1238,7 +1237,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(FoldingActionCommand.FOLD_MUTILATION_P, ppoint, pnormal, polygonIndex, 0);
+		addCommand(CommandFoldMutilation.foldId, ppoint, pnormal, polygonIndex, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1381,7 +1380,7 @@ public class OrigamiGen1 implements Origami {
 	public void execute() {
 
 		for (int i = 0; i < historyPointer; i++) {
-
+			System.out.println(" i :" + i + ", action : " + foldingActionList.getAtIndex(i).foldId);
 			foldingActionList.executeAtIndex(i);
 		}
 	}
@@ -1408,7 +1407,7 @@ public class OrigamiGen1 implements Origami {
 		if (historyPointer > 0) {
 
 			historyPointer--;
-			while (0 < historyPointer ? ((FoldingActionCommand)foldingActionList.getAtIndex(historyPointer - 1)).foldID == FoldingActionCommand.FOLD_CREASE : false) {
+			while (0 < historyPointer ? (foldingActionList.getAtIndex(historyPointer - 1)).foldId == CommandFoldCrease.foldId : false) {
 				historyPointer--;
 			}
 			reset();
@@ -1439,7 +1438,7 @@ public class OrigamiGen1 implements Origami {
 		if (foldingActionList.getSize() > historyPointer) {
 
 			historyPointer++;
-			while (((FoldingActionCommand)foldingActionList.getAtIndex(historyPointer - 1)).foldID == FoldingActionCommand.FOLD_CREASE) {
+			while ((foldingActionList.getAtIndex(historyPointer - 1)).foldId == CommandFoldCrease.foldId) {
 				historyPointer++;
 			}
 			reset();
@@ -1938,7 +1937,7 @@ public class OrigamiGen1 implements Origami {
 		if (step > origami.historyPointer) {
 			return 0;
 		}
-		if (((FoldingActionCommand) (origami.foldingActionList.getAtIndex(step))).foldID == FoldingActionCommand.FOLD_REFLECTION) {
+		if ((origami.foldingActionList.getAtIndex(step)).foldId == CommandFoldReflection.foldId) {
 
 			origami.undo(origami.historyPointer - step);
 			origami.redo(1);
@@ -1970,15 +1969,14 @@ public class OrigamiGen1 implements Origami {
 
 			return maxcompl;
 		}
-		if (((FoldingActionCommand)origami.foldingActionList.getAtIndex(step)).foldID == FoldingActionCommand.FOLD_REFLECTION_P) {
+		if (origami.foldingActionList.getAtIndex(step).foldId == CommandFoldReflectionP.foldId) {
 
 			origami.undo(origami.historyPointer - step + 1);
 			origami.redo(1);
-
-			double[] point = ((FoldingActionCommand)origami.foldingActionList.getAtIndex(step)).ppoint;
-			double[] normal = ((FoldingActionCommand)origami.foldingActionList.getAtIndex(step)).pnormal;
-			int index = ((FoldingActionCommand)origami.foldingActionList.getAtIndex(step)).polygonIndex;
-
+			CommandFold currentCommand = origami.foldingActionList.getAtIndex(step);
+			double[] point = currentCommand.ppoint;
+			double[] normal = currentCommand.pnormal;
+			int index = currentCommand.getPolygonIndex();
 			ArrayList<int[]> pairs = new ArrayList<int[]>(origami.cutpolygon_pairs);
 			ArrayList<Integer> selection = origami.polygonSelect(point, normal, index);
 			int compl = 0;
