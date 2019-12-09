@@ -1,11 +1,7 @@
 package origamieditor3d.origami;
 
 public abstract class CommandFold implements Command {
-	protected static int foldID;
-
-	public static int getFoldID() {
-		return foldID;
-	}
+	public abstract int getFoldID();
 
 	protected double [] ppoint;
 	protected double [] pnormal;

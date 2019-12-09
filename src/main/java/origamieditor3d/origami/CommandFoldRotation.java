@@ -1,9 +1,7 @@
 package origamieditor3d.origami;
 
 public class CommandFoldRotation extends CommandFold {
-	static {
-		foldID = 2;
-	}
+	static public final int foldID = 2;
 
 	int phi;
 
@@ -12,6 +10,11 @@ public class CommandFoldRotation extends CommandFold {
 		this.pnormal = pnormal;
 		this.phi = phi;
 		this.origami = origami;
+	}
+
+	@Override
+	public int getFoldID() {
+		return foldID;
 	}
 
 	@Override

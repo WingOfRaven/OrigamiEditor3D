@@ -1,9 +1,7 @@
 package origamieditor3d.origami;
 
 public class CommandFoldMutilationP extends CommandFold {
-	static {
-		foldID = 7;
-	}
+	static public final int foldID = 7;
 
 	int polygonIndex;
 
@@ -14,6 +12,11 @@ public class CommandFoldMutilationP extends CommandFold {
 		this.polygonIndex = polygonIndex;
 		this.origami = origami;
 
+	}
+
+	@Override
+	public int getFoldID() {
+		return foldID;
 	}
 
 	@Override

@@ -1,9 +1,7 @@
 package origamieditor3d.origami;
 
 public class CommandFoldCrease extends CommandFold {
-	static {
-		foldID = 5;
-	}
+	static public final int foldID = 5;
 
 	protected int phi;
 
@@ -13,6 +11,11 @@ public class CommandFoldCrease extends CommandFold {
 		this.pnormal = pnormal;
 		this.origami = origami;
 
+	}
+
+	@Override
+	public int getFoldID() {
+		return foldID;
 	}
 
 	@Override

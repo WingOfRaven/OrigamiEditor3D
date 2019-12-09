@@ -1,9 +1,7 @@
 package origamieditor3d.origami;
 
 public class CommandFoldReflectionP extends CommandFold {
-	static {
-		foldID = 3;
-	}
+	static public final int foldID = 3;
 
 	int polygonIndex;
 
@@ -12,6 +10,11 @@ public class CommandFoldReflectionP extends CommandFold {
 		this.pnormal = pnormal;
 		this.origami = origami;
 		this.polygonIndex = polygonIndex;
+	}
+
+	@Override
+	public int getFoldID() {
+		return foldID;
 	}
 
 	@Override

@@ -1162,7 +1162,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(CommandFoldReflection.getFoldID(), ppoint, pnormal, 0, 0);
+		addCommand(CommandFoldReflection.foldID, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1175,7 +1175,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(CommandFoldReflectionP.getFoldID(), ppoint, pnormal, polygonIndex, 0);
+		addCommand(CommandFoldReflectionP.foldID, ppoint, pnormal, polygonIndex, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1188,7 +1188,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(CommandFoldRotation.getFoldID(), ppoint, pnormal, 0, phi);
+		addCommand(CommandFoldRotation.foldID, ppoint, pnormal, 0, phi);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1201,7 +1201,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(CommandFoldRotationP.getFoldID(), ppoint, pnormal, polygonIndex, phi);
+		addCommand(CommandFoldRotationP.foldID, ppoint, pnormal, polygonIndex, phi);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1214,7 +1214,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(CommandFoldCrease.getFoldID(), ppoint, pnormal, 0, 0);
+		addCommand(CommandFoldCrease.foldID, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1227,7 +1227,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(CommandFoldMutilation.getFoldID(), ppoint, pnormal, 0, 0);
+		addCommand(CommandFoldMutilation.foldID, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
@@ -1240,7 +1240,7 @@ public class OrigamiGen1 implements Origami {
 
 		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
-		addCommand(CommandFoldMutilation.getFoldID(), ppoint, pnormal, polygonIndex, 0);
+		addCommand(CommandFoldMutilation.foldID, ppoint, pnormal, polygonIndex, 0);
 		execute(historyPointer, 1);
 		historyPointer++;
 	}
