@@ -203,10 +203,10 @@ public class Export {
             //Megszámoljuk, hány mûvelet nem lesz külön feltüntetve
             ArrayList<Integer> UresIndexek = new ArrayList<>();
 
-            for (int i = 0; i < origami1.getHistory().size(); i++) {
+            for (int i = 0; i < origami1.getHistory().getSize(); i++) {
                 if (origami1.getHistory().get(i) instanceof CommandFoldCrease) {
                     UresIndexek.add(i);
-                } else if (i < origami1.getHistory().size() - 1 && origami1.getHistory().get(i).getClass().equals(origami1.getHistory().get(i+1).getClass())) {
+                } else if (i < origami1.getHistory().getSize() - 1 && origami1.getHistory().get(i).getClass().equals(origami1.getHistory().get(i+1).getClass())) {
                     if (origami1.getHistory().get(i) instanceof CommandFoldRotation) {
                         if (origami1.getHistory().get(i + 1).getPpoint() == origami1.getHistory().get(i).getPpoint() &&
                                 origami1.getHistory().get(i + 1).getPnormal() == origami1.getHistory().get(i).getPnormal()) {
@@ -235,7 +235,7 @@ public class Export {
             kamera.nextOrthogonalView();
 
             //Felmérjük az olyan lépések számát, amikhez szemszögváltás kell.
-            for (int i = 0; i < origami1.getHistory().size(); i++) {
+            for (int i = 0; i < origami1.getHistory().getSize(); i++) {
 
                 double[] regiVaszonNV = kamera.getCamDirection();
 
@@ -255,10 +255,10 @@ public class Export {
                     ForgatasSzogek.add((int) (Math.acos(cos >= -1 && cos <= 1 ? cos : 1) / Math.PI * 180));
                 }
             }
-            ForgatasIndexek.add(origami1.getHistory().size());
+            ForgatasIndexek.add(origami1.getHistory().getSize());
 
             //Egy oldalon 6 cella van (papírmérettôl függetlenül)
-            int cellak_szama = origami1.getHistory().size() + ForgatasIndexek.size() - UresIndexek.size() + 2;
+            int cellak_szama = origami1.getHistory().getSize() + ForgatasIndexek.size() - UresIndexek.size() + 2;
 
             //Fejléc
             StringBuilder fajl = new StringBuilder();
@@ -368,9 +368,9 @@ public class Export {
             int objindex = (int) Math.ceil((double) cellak_szama / 6) + 5;
 
             //Ábrák
-            for (int i = 0; i <= origami1.getHistory().size(); i++) {
+            for (int i = 0; i <= origami1.getHistory().getSize(); i++) {
 
-                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().getSize())) {
 
                     String kep;
 
@@ -421,7 +421,7 @@ public class Export {
                     fajl = new StringBuilder();
                 }
                 origami1.execute(i, 1);
-                if (i < origami1.getHistory().size()) {
+                if (i < origami1.getHistory().getSize()) {
                     if (origami1.getHistory().get(i) instanceof CommandFoldReflection) {
 
                         double[] ppoint = origami1.getHistory().get(i).getPpoint();
@@ -471,16 +471,16 @@ public class Export {
             int sorszam = 1;
 
             //Szövegek
-            for (int i = 0; i <= origami1.getHistory().size(); i++) {
+            for (int i = 0; i <= origami1.getHistory().getSize(); i++) {
 
                 String utasitas = "";
                 String koo = "";
 
-                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().getSize())) {
 
                     if (ForgatasIndexek.contains(i)) {
 
-                        if (i == origami1.getHistory().size()) {
+                        if (i == origami1.getHistory().getSize()) {
 
                             utasitas = Instructor.getString("outro", sorszam);
                             sorszam++;

@@ -8,7 +8,7 @@ import java.util.List;
  * @since 2013-01-14
  */
 public class OrigamiGen1 implements Origami {
-	protected CommandsList foldingActionList;
+	protected CommandList foldingActionList;
 
 	/**
 	 * Creates a new origami model. <br>
@@ -26,7 +26,7 @@ public class OrigamiGen1 implements Origami {
 		verticesSize = 0;
 		polygons = new ArrayList<>();
 		polygonsSize = 0;
-		foldingActionList = new CommandsList();
+		foldingActionList = new CommandList();
 		historyStream = new ArrayList<>();
 		historyPointer = 0;
 		this.paperType = papertype;
@@ -54,7 +54,7 @@ public class OrigamiGen1 implements Origami {
 		verticesSize = 0;
 		polygons = new ArrayList<>();
 		polygonsSize = 0;
-		foldingActionList = new CommandsList();
+		foldingActionList = new CommandList();
 		historyStream = new ArrayList<>();
 		historyPointer = 0;
 		paperType = PaperType.Custom;
@@ -74,12 +74,11 @@ public class OrigamiGen1 implements Origami {
 		polygonsSize = 0;
 		paperType = origami.paperType;
 		corners = new ArrayList<double[]>(origami.corners);
-		//history = new ArrayList<FoldingActionCommand>(origami.history);
-		foldingActionList = new CommandsList();
+		foldingActionList = new CommandList(origami.foldingActionList, this);
 		historyStream = new ArrayList<int[]>(origami.historyStream);
 		historyPointer = origami.historyPointer;
 		reset();
-		//execute();
+		execute();
 	}
 
 	/* (non-Javadoc)
@@ -90,11 +89,13 @@ public class OrigamiGen1 implements Origami {
 		return 1;
 	}
 
-	public CommandsList getHistory() {
+	@Override
+	public CommandList getHistory() {
 		return foldingActionList;
 	};
 
-	public CommandsList getCommandsList() {
+	@Override
+	public CommandList getCommandsList() {
 		return foldingActionList;
 	};
 
@@ -1160,7 +1161,7 @@ public class OrigamiGen1 implements Origami {
 	@Override
 	public void reflectionFold(double[] ppoint, double[] pnormal) {
 
-		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
+		foldingActionList.clearRange(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
 		addCommand(CommandFoldReflection.foldID, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
@@ -1173,7 +1174,7 @@ public class OrigamiGen1 implements Origami {
 	@Override
 	public void reflectionFold(double[] ppoint, double[] pnormal, int polygonIndex) {
 
-		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
+		foldingActionList.clearRange(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
 		addCommand(CommandFoldReflectionP.foldID, ppoint, pnormal, polygonIndex, 0);
 		execute(historyPointer, 1);
@@ -1186,7 +1187,7 @@ public class OrigamiGen1 implements Origami {
 	@Override
 	public void rotationFold(double[] ppoint, double[] pnormal, int phi) {
 
-		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
+		foldingActionList.clearRange(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
 		addCommand(CommandFoldRotation.foldID, ppoint, pnormal, 0, phi);
 		execute(historyPointer, 1);
@@ -1199,7 +1200,7 @@ public class OrigamiGen1 implements Origami {
 	@Override
 	public void rotationFold(double[] ppoint, double[] pnormal, int phi, int polygonIndex) {
 
-		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
+		foldingActionList.clearRange(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
 		addCommand(CommandFoldRotationP.foldID, ppoint, pnormal, polygonIndex, phi);
 		execute(historyPointer, 1);
@@ -1212,7 +1213,7 @@ public class OrigamiGen1 implements Origami {
 	@Override
 	public void crease(double[] ppoint, double[] pnormal) {
 
-		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
+		foldingActionList.clearRange(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
 		addCommand(CommandFoldCrease.foldID, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
@@ -1225,7 +1226,7 @@ public class OrigamiGen1 implements Origami {
 	@Override
 	public void mutilation(double[] ppoint, double[] pnormal) {
 
-		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
+		foldingActionList.clearRange(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
 		addCommand(CommandFoldMutilation.foldID, ppoint, pnormal, 0, 0);
 		execute(historyPointer, 1);
@@ -1238,7 +1239,7 @@ public class OrigamiGen1 implements Origami {
 	@Override
 	public void mutilation(double[] ppoint, double[] pnormal, int polygonIndex) {
 
-		foldingActionList.clearPart(historyPointer, foldingActionList.getSize());
+		foldingActionList.clearRange(historyPointer, foldingActionList.getSize());
 		historyStream.subList(historyPointer, historyStream.size()).clear();
 		addCommand(CommandFoldMutilation.foldID, ppoint, pnormal, polygonIndex, 0);
 		execute(historyPointer, 1);
@@ -1384,7 +1385,7 @@ public class OrigamiGen1 implements Origami {
 
 		for (int i = 0; i < historyPointer; i++) {
 			System.out.println(" i :" + i + ", action : " + foldingActionList.get(i).getFoldID());
-			foldingActionList.executeAtIndex(i);
+			foldingActionList.execute(i);
 		}
 	}
 
@@ -1396,7 +1397,7 @@ public class OrigamiGen1 implements Origami {
 
 		if (index + steps <= foldingActionList.getSize()) {
 			for (int i = index; i < index + steps && i >= 0; i++) {
-				foldingActionList.executeAtIndex(i);
+				foldingActionList.execute(i);
 			}
 		}
 	}

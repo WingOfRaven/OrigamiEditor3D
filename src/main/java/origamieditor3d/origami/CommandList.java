@@ -2,7 +2,7 @@ package origamieditor3d.origami;
 
 import java.util.LinkedList;
 
-public class CommandsList {
+public class CommandList {
 
 	/** The commands. */
 	private LinkedList<CommandFold> commands;
@@ -14,13 +14,32 @@ public class CommandsList {
 	/** The window. */
 
 	/**
-	 * Instantiates a new CommandsList.
+	 * Instantiates a new CommandList.
 	 * @param window the window
 	 */
-	public CommandsList() {
+	public CommandList() {
 
-		commands = new LinkedList<CommandFold>();
+		commands = new LinkedList<>();
 		index = -1;
+	}
+
+	/**
+	 * Instantiates a new CommandList.
+	 * @param window the window
+	 */
+	public CommandList(CommandList commandList, OrigamiGen1 newOrigami) {
+
+		commands = new LinkedList<>();
+		for (CommandFold command : commandList.commands) {
+		    try {
+		        CommandFold newCommand = (CommandFold) command.clone();
+		        newCommand.setOrigami(newOrigami);
+                commands.add(newCommand);
+            } catch (CloneNotSupportedException e) {
+		        throw new RuntimeException(e);
+            }
+        }
+		index = commandList.index;
 	}
 	
 	
@@ -84,24 +103,17 @@ public class CommandsList {
 	
 	}
 
-	public int size() {
-		return commands.size();
-	}
 	public int getSize() {
 		return commands.size();
 	}
 	
-	
-	public void executeAtIndex(int index) {
+	public void execute(int index) {
 		commands.get(index).execute();
 	}
-	public CommandFold get(int index) {
-		return commands.get(index);
-	}
-	public void clearPart (int start, int end) {
+
+	public CommandFold get(int index) { return commands.get(index);	}
+
+	public void clearRange(int start, int end) {
 		commands.subList(start, end).clear();
 	}
-
-
-
 }

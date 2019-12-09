@@ -64,8 +64,8 @@ public interface Origami {
 	 *
 	 * @return As described above.
 	 */
-	CommandsList getCommandsList();
-	CommandsList getHistory();
+	CommandList getCommandsList();
+	CommandList getHistory();
 	
 	int getHistoryPointer();
 

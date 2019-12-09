@@ -7,13 +7,11 @@ public class CommandFoldRotationP extends CommandFold {
 	int polygonIndex;
 
 	public CommandFoldRotationP(double[] ppoint, double[] pnormal,  int polygonIndex, int phi, OrigamiGen1 origami) {
-
+		super(origami);
 		this.ppoint = ppoint;
 		this.pnormal = pnormal;
 		this.phi = phi;
 		this.polygonIndex = polygonIndex;
-		this.origami = origami;
-
 	}
 
 	@Override

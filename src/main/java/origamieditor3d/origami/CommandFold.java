@@ -1,11 +1,18 @@
 package origamieditor3d.origami;
 
-public abstract class CommandFold implements Command {
+public abstract class CommandFold implements Command, Cloneable {
 	public abstract int getFoldID();
 
 	protected double [] ppoint;
 	protected double [] pnormal;
 	protected OrigamiGen1 origami;
+
+	public CommandFold(OrigamiGen1 origami) { setOrigami(origami); }
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 
 	public double[] getPpoint() {
 		return this.ppoint;
@@ -22,4 +29,6 @@ public abstract class CommandFold implements Command {
 	public int getPhi() {
 		return 0;
 	}
+
+	public void setOrigami(OrigamiGen1 origami) { this.origami = origami; }
 }
