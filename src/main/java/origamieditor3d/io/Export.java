@@ -15,10 +15,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 
 import origamieditor3d.graphics.Camera;
-import origamieditor3d.origami.Geometry;
-import origamieditor3d.origami.Origami;
-import origamieditor3d.origami.OrigamiException;
-import origamieditor3d.origami.OrigamiGen1;
+import origamieditor3d.origami.*;
 import origamieditor3d.resources.Constants;
 import origamieditor3d.resources.Instructor;
 
@@ -156,7 +153,7 @@ public class Export {
     private static void setCameraDirection(Camera kamera, Origami origami1, int i, boolean ignoreSign) {
         double[] regiVaszonNV = kamera.getCamDirection();
 
-        kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
+        kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).getPnormal(),
                 new double[]{0, 1, 0}));
 
         if (Geometry.scalarProduct(kamera.getCamDirection(), kamera.getCamDirection()) < 0.00000001) {
@@ -206,19 +203,19 @@ public class Export {
             //Megszámoljuk, hány mûvelet nem lesz külön feltüntetve
             ArrayList<Integer> UresIndexek = new ArrayList<>();
 
-            for (int i = 0; i < origami1.getHistory().size(); i++) {
-                if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_CREASE) {
+            for (int i = 0; i < origami1.getHistory().getSize(); i++) {
+                if (origami1.getHistory().get(i) instanceof CommandFoldCrease) {
                     UresIndexek.add(i);
-                } else if (i < origami1.getHistory().size() - 1 && origami1.getHistory().get(i).foldID == origami1.getHistory().get(i+1).foldID) {
-                    if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION) {
-                        if (origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint &&
-                                origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal) {
+                } else if (i < origami1.getHistory().getSize() - 1 && origami1.getHistory().get(i).getClass().equals(origami1.getHistory().get(i+1).getClass())) {
+                    if (origami1.getHistory().get(i) instanceof CommandFoldRotation) {
+                        if (origami1.getHistory().get(i + 1).getPpoint() == origami1.getHistory().get(i).getPpoint() &&
+                                origami1.getHistory().get(i + 1).getPnormal() == origami1.getHistory().get(i).getPnormal()) {
                             UresIndexek.add(i + 1);
                         }
-                    } else if (origami1.getHistory().get(i).foldID == Origami.FoldingAction.FOLD_ROTATION_P) {
-                        if (origami1.getHistory().get(i + 1).ppoint == origami1.getHistory().get(i).ppoint
-                                && origami1.getHistory().get(i + 1).pnormal == origami1.getHistory().get(i).pnormal
-                                && origami1.getHistory().get(i + 1).polygonIndex == origami1.getHistory().get(i).polygonIndex) {
+                    } else if (origami1.getHistory().get(i) instanceof CommandFoldRotationP) {
+                        if (origami1.getHistory().get(i + 1).getPpoint() == origami1.getHistory().get(i).getPpoint()
+                                && origami1.getHistory().get(i + 1).getPnormal() == origami1.getHistory().get(i).getPnormal()
+                                && origami1.getHistory().get(i + 1).getPolygonIndex() == origami1.getHistory().get(i).getPolygonIndex()) {
                             UresIndexek.add(i + 1);
                         }
                     }
@@ -238,11 +235,11 @@ public class Export {
             kamera.nextOrthogonalView();
 
             //Felmérjük az olyan lépések számát, amikhez szemszögváltás kell.
-            for (int i = 0; i < origami1.getHistory().size(); i++) {
+            for (int i = 0; i < origami1.getHistory().getSize(); i++) {
 
                 double[] regiVaszonNV = kamera.getCamDirection();
 
-                kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).pnormal,
+                kamera.setCamDirection(Geometry.crossProduct(origami1.getHistory().get(i).getPnormal(),
                         new double[]{0, 1, 0}));
 
                 if (Geometry.vectorLength(kamera.getCamDirection()) < .00000001) {
@@ -258,10 +255,10 @@ public class Export {
                     ForgatasSzogek.add((int) (Math.acos(cos >= -1 && cos <= 1 ? cos : 1) / Math.PI * 180));
                 }
             }
-            ForgatasIndexek.add(origami1.getHistory().size());
+            ForgatasIndexek.add(origami1.getHistory().getSize());
 
             //Egy oldalon 6 cella van (papírmérettôl függetlenül)
-            int cellak_szama = origami1.getHistory().size() + ForgatasIndexek.size() - UresIndexek.size() + 2;
+            int cellak_szama = origami1.getHistory().getSize() + ForgatasIndexek.size() - UresIndexek.size() + 2;
 
             //Fejléc
             StringBuilder fajl = new StringBuilder();
@@ -371,9 +368,9 @@ public class Export {
             int objindex = (int) Math.ceil((double) cellak_szama / 6) + 5;
 
             //Ábrák
-            for (int i = 0; i <= origami1.getHistory().size(); i++) {
+            for (int i = 0; i <= origami1.getHistory().getSize(); i++) {
 
-                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().getSize())) {
 
                     String kep;
 
@@ -393,28 +390,22 @@ public class Export {
                         double[] sikpont;
                         double[] siknv;
 
-                        switch (origami1.getHistory().get(i).foldID) {
-
-                            case Origami.FoldingAction.FOLD_REFLECTION:
-                            case Origami.FoldingAction.FOLD_ROTATION:
-                            case Origami.FoldingAction.FOLD_CREASE:
-                            case Origami.FoldingAction.FOLD_MUTILATION:
-                                sikpont = origami1.getHistory().get(i).ppoint;
-                                siknv = origami1.getHistory().get(i).pnormal;
-                                kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                                break;
-
-                            case Origami.FoldingAction.FOLD_REFLECTION_P:
-                            case Origami.FoldingAction.FOLD_ROTATION_P:
-                            case Origami.FoldingAction.FOLD_MUTILATION_P:
-                                sikpont = origami1.getHistory().get(i).ppoint;
-                                siknv = origami1.getHistory().get(i).pnormal;
-                                kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).polygonIndex, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
-                                break;
-
-                            default:
-                                kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
-                                break;
+                        CommandFold commandFold = origami1.getHistory().get(i);
+                        if (commandFold instanceof CommandFoldReflection
+                                || commandFold instanceof CommandFoldRotation
+                                || commandFold instanceof CommandFoldCrease
+                                || commandFold instanceof CommandFoldMutilation) {
+                            sikpont = origami1.getHistory().get(i).getPpoint();
+                            siknv = origami1.getHistory().get(i).getPnormal();
+                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
+                        } else if (commandFold instanceof CommandFoldReflectionP
+                                || commandFold instanceof CommandFoldRotationP
+                                || commandFold instanceof CommandFoldMutilationP) {
+                            sikpont = origami1.getHistory().get(i).getPpoint();
+                            siknv = origami1.getHistory().get(i).getPnormal();
+                            kep = kamera.drawSelection(x, y, sikpont, siknv, origami1.getHistory().get(i).getPolygonIndex(), origami1) + kamera.drawEdges(x, y, origami1) + kamera.pfdLiner(x, y, sikpont, siknv);
+                        } else {
+                            kep = kamera.drawFaces(x, y, origami1) + kamera.drawEdges(x, y, origami1);
                         }
                     }
 
@@ -430,17 +421,17 @@ public class Export {
                     fajl = new StringBuilder();
                 }
                 origami1.execute(i, 1);
-                if (i < origami1.getHistory().size()) {
-                    if (origami1.getHistory().get(i).foldID == 1) {
+                if (i < origami1.getHistory().getSize()) {
+                    if (origami1.getHistory().get(i) instanceof CommandFoldReflection) {
 
-                        double[] ppoint = origami1.getHistory().get(i).ppoint;
-                        double[] pnormal = origami1.getHistory().get(i).pnormal;
+                        double[] ppoint = origami1.getHistory().get(i).getPpoint();
+                        double[] pnormal = origami1.getHistory().get(i).getPnormal();
                         foldtypes.add(origami1.foldType(ppoint, pnormal));
-                    } else if (origami1.getHistory().get(i).foldID == 3) {
+                    } else if (origami1.getHistory().get(i) instanceof CommandFoldReflectionP) {
 
-                        double[] ppoint = origami1.getHistory().get(i).ppoint;
-                        double[] pnormal = origami1.getHistory().get(i).pnormal;
-                        int polygonIndex = origami1.getHistory().get(i).polygonIndex;
+                        double[] ppoint = origami1.getHistory().get(i).getPpoint();
+                        double[] pnormal = origami1.getHistory().get(i).getPnormal();
+                        int polygonIndex = origami1.getHistory().get(i).getPolygonIndex();
                         foldtypes.add(origami1.foldType(ppoint, pnormal, polygonIndex));
                     } else {
                         foldtypes.add(null);
@@ -480,16 +471,16 @@ public class Export {
             int sorszam = 1;
 
             //Szövegek
-            for (int i = 0; i <= origami1.getHistory().size(); i++) {
+            for (int i = 0; i <= origami1.getHistory().getSize(); i++) {
 
                 String utasitas = "";
                 String koo = "";
 
-                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().size())) {
+                if (ForgatasIndexek.contains(i) || (!UresIndexek.contains(i) && i < origami1.getHistory().getSize())) {
 
                     if (ForgatasIndexek.contains(i)) {
 
-                        if (i == origami1.getHistory().size()) {
+                        if (i == origami1.getHistory().getSize()) {
 
                             utasitas = Instructor.getString("outro", sorszam);
                             sorszam++;
@@ -504,97 +495,81 @@ public class Export {
 
                         String direction = null;
 
-                        switch (origami1.getHistory().get(i).foldID) {
-                            case Origami.FoldingAction.FOLD_REFLECTION:
-                            case Origami.FoldingAction.FOLD_ROTATION:
-                            case Origami.FoldingAction.FOLD_MUTILATION:
-                                double[] siknv = origami1.getHistory().get(i).pnormal;
-                                direction = kamera.pdfLinerDir(siknv).toString();
-                                break;
-                            case Origami.FoldingAction.FOLD_REFLECTION_P:
-                            case Origami.FoldingAction.FOLD_ROTATION_P:
-                            case Origami.FoldingAction.FOLD_MUTILATION_P:
-                                direction = "gray";
-                                break;
-                            default:
-                                break;
+                        CommandFold commandFold = origami1.getHistory().get(i);
+
+                        if (commandFold instanceof CommandFoldReflection
+                                || commandFold instanceof CommandFoldRotation
+                                || commandFold instanceof CommandFoldMutilation) {
+                            double[] siknv = commandFold.getPnormal();
+                            direction = kamera.pdfLinerDir(siknv).toString();
+                        }
+                        else if (commandFold instanceof CommandFoldReflectionP
+                                || commandFold instanceof CommandFoldRotationP
+                                || commandFold instanceof CommandFoldMutilationP) {
+                            direction = "gray";
                         }
 
-                        switch (origami1.getHistory().get(i).foldID) {
+                        if (commandFold instanceof CommandFoldReflection || commandFold instanceof CommandFoldReflectionP) {
+                            switch (foldtypes.get(i)) {
 
-                            case Origami.FoldingAction.FOLD_REFLECTION:
-                            case Origami.FoldingAction.FOLD_REFLECTION_P:
-                                switch (foldtypes.get(i)) {
+                                case 0:
+                                    utasitas = Instructor.getString("no_fold", sorszam);
+                                    break;
 
-                                    case 0:
-                                        utasitas = Instructor.getString("no_fold", sorszam);
-                                        break;
+                                case -1:
+                                    utasitas = Instructor.getString("fold_" + direction, sorszam);
+                                    break;
 
-                                    case -1:
-                                        utasitas = Instructor.getString("fold_" + direction, sorszam);
-                                        break;
+                                case -2:
+                                    utasitas = Instructor.getString("fold/rev_" + direction, sorszam);
+                                    break;
 
-                                    case -2:
-                                        utasitas = Instructor.getString("fold/rev_" + direction, sorszam);
-                                        break;
+                                case -3:
+                                    utasitas = Instructor.getString("rev_" + direction, sorszam);
+                                    break;
 
-                                    case -3:
-                                        utasitas = Instructor.getString("rev_" + direction, sorszam);
-                                        break;
+                                case -4:
+                                    utasitas = Instructor.getString("fold/sink_" + direction, sorszam);
+                                    break;
 
-                                    case -4:
-                                        utasitas = Instructor.getString("fold/sink_" + direction, sorszam);
-                                        break;
+                                case -5:
+                                    utasitas = Instructor.getString("rev/sink_" + direction, sorszam);
+                                    break;
 
-                                    case -5:
-                                        utasitas = Instructor.getString("rev/sink_" + direction, sorszam);
-                                        break;
+                                default:
+                                    if (!direction.equals("gray"))
+                                        utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
+                                    break;
+                            }
 
-                                    default:
-                                        if (!direction.equals("gray"))
-                                            utasitas = Instructor.getString("compound", sorszam, foldtypes.get(i));
-                                        break;
+                            sorszam++;
+                        } else if (commandFold instanceof CommandFoldRotation || commandFold instanceof CommandFoldRotationP) {
+                            int szog = 0;
+                            int j = i - 1;
+                            while (UresIndexek.contains(j)) {
+
+                                if (origami1.getHistory().get(j).getClass().equals(origami1.getHistory().get(i).getClass())) {
+
+                                    szog += origami1.getHistory().get(j).getPhi();
                                 }
+                                j--;
+                            }
 
-                                sorszam++;
-                                break;
-
-                            case Origami.FoldingAction.FOLD_ROTATION:
-                            case Origami.FoldingAction.FOLD_ROTATION_P:
-                                int szog = 0;
-                                int j = i - 1;
-                                while (UresIndexek.contains(j)) {
-
-                                    if (origami1.getHistory().get(j).foldID == origami1.getHistory().get(i).foldID) {
-
-                                        szog += origami1.getHistory().get(j).phi;
-                                    }
-                                    j--;
-                                }
-
-                                utasitas = Instructor.getString("rotate_" + direction, sorszam, szog + origami1.getHistory().get(i).phi);
-                                sorszam++;
-                                break;
-
-                            case Origami.FoldingAction.FOLD_CREASE:
-                                utasitas = Instructor.getString("crease", sorszam, sorszam + 1);
-                                sorszam++;
-                                break;
-
-                            case Origami.FoldingAction.FOLD_MUTILATION:
-                            case Origami.FoldingAction.FOLD_MUTILATION_P:
-                                utasitas = Instructor.getString("cut_" + direction, sorszam);
-                                if (firstblood) {
-                                    utasitas += Instructor.getString("cut_notice");
-                                    firstblood = false;
-                                }
-                                sorszam++;
-                                break;
-
-                            default:
-                                utasitas = "(" + sorszam + ". ???) ' ";
-                                sorszam++;
-                                break;
+                            utasitas = Instructor.getString("rotate_" + direction, sorszam, szog + origami1.getHistory().get(i).getPhi());
+                            sorszam++;
+                        } else if (commandFold instanceof CommandFoldCrease) {
+                            utasitas = Instructor.getString("crease", sorszam, sorszam + 1);
+                            sorszam++;
+                        } else if (commandFold instanceof CommandFoldMutilation || commandFold instanceof CommandFoldMutilationP) {
+                            utasitas = Instructor.getString("cut_" + direction, sorszam);
+                            if (firstblood) {
+                                utasitas += Instructor.getString("cut_notice");
+                                firstblood = false;
+                            }
+                            sorszam++;
+                        } else {
+                            utasitas = "(" + sorszam + ". ???) ' ";
+                            sorszam++;
                         }
 
                         if (i == 0) {

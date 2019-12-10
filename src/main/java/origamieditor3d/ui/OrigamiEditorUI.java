@@ -222,7 +222,7 @@ public class OrigamiEditorUI extends JFrame {
 					}
 					foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 					changeListenerShutUp = true;
-					timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+					timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 					changeListenerShutUp = false;
 					timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 				}
@@ -288,7 +288,7 @@ public class OrigamiEditorUI extends JFrame {
 					}
 					foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 					changeListenerShutUp = true;
-					timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+					timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 					changeListenerShutUp = false;
 					timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 				}
@@ -1441,7 +1441,7 @@ public class OrigamiEditorUI extends JFrame {
 			}
 			foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 			changeListenerShutUp = true;
-			timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+			timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 			changeListenerShutUp = false;
 			timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 			saved = false;
@@ -1584,7 +1584,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_pPanel1MouseClicked
@@ -1729,7 +1729,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 		if (alignOn) {
@@ -1817,7 +1817,7 @@ public class OrigamiEditorUI extends JFrame {
 
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 		if (alignOn) {
@@ -1923,7 +1923,7 @@ public class OrigamiEditorUI extends JFrame {
 
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 		if (alignOn) {
@@ -2084,7 +2084,7 @@ public class OrigamiEditorUI extends JFrame {
 		saved = false;
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_edit_undoActionPerformed
@@ -2254,7 +2254,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_openActionPerformed
@@ -2289,7 +2289,7 @@ public class OrigamiEditorUI extends JFrame {
 		saved = false;
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_edit_redoActionPerformed
@@ -2331,7 +2331,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_hexagonalActionPerformed
@@ -2373,7 +2373,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_squareActionPerformed
@@ -2415,7 +2415,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_a4ActionPerformed
@@ -2457,7 +2457,7 @@ public class OrigamiEditorUI extends JFrame {
 		}
 		foldNumber = terminal1.TerminalOrigami.getHistoryPointer();
 		changeListenerShutUp = true;
-		timeSlider.setMaximum(terminal1.TerminalOrigami.getHistory().size());
+		timeSlider.setMaximum(terminal1.TerminalOrigami.getCommandsList().getSize());
 		changeListenerShutUp = false;
 		timeSlider.setValue(terminal1.TerminalOrigami.getHistoryPointer());
 	}// GEN-LAST:event_ui_file_new_dollarActionPerformed
@@ -2782,7 +2782,7 @@ public class OrigamiEditorUI extends JFrame {
 		if (foldNumber == timeSlider.getValue() || changeListenerShutUp) {
 			return;
 		}
-		if (terminal1.TerminalOrigami.getHistory().size() < 100) {
+		if (terminal1.TerminalOrigami.getCommandsList().getSize() < 100) {
 			if (foldNumber < timeSlider.getValue()) {
 				terminal1.TerminalOrigami.redo(timeSlider.getValue() - foldNumber);
 			}
@@ -3220,7 +3220,7 @@ public class OrigamiEditorUI extends JFrame {
 		properties.getContentPane().add(new JLabel(" "), c);
 		c.gridy = 4;
 		properties.getContentPane()
-				.add(new JLabel(Integer.toString(terminal1.TerminalOrigami.getHistory().size())), c);
+				.add(new JLabel(Integer.toString(terminal1.TerminalOrigami.getCommandsList().getSize())), c);
 		c.gridy = 5;
 		properties.getContentPane().add(new JLabel(" "), c);
 		c.gridy = 6;
